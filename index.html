@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en-JM">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#060c24" />
+  <meta name="description" content="Boot-Up Café — fresh wings, wraps, blended juices and flavour-packed combos. Build your order and send it via WhatsApp." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="BOOT-UP CAFÉ | Fuel Your Day With Flavor" />
+  <meta property="og:description" content="Tap, customise and order delicious wings, wraps, juice and combos in Jamaica." />
+  <link rel="icon" type="image/svg+xml" href="./assets/bootup-icon.svg" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="stylesheet" href="./styles.css" />
+  <title>BOOT-UP CAFÉ | Fuel Your Day With Flavor</title>
+</head>
+<body>
+  <div class="ambient ambient-one" aria-hidden="true"></div>
+  <div class="ambient ambient-two" aria-hidden="true"></div>
+  <div id="app">
+    <header class="site-header" id="top">
+      <div class="shell header-content">
+        <a href="#top" class="brand" aria-label="Boot-Up Café home">
+          <img src="./assets/bootup-icon.svg" alt="" width="59" height="59" />
+          <span class="brand-word"><strong>BOOT<span>UP</span></strong><small>CAFÉ</small></span>
+        </a>
+        <nav class="desktop-nav" aria-label="Main navigation">
+          <a href="#menu">Menu</a><a href="#combos">Combos</a><a href="#about">About</a>
+        </nav>
+        <div class="header-actions">
+          <button class="icon-button subtle" id="share-btn" aria-label="Share Boot-Up Café">↗</button>
+          <button class="qr-trigger" id="qr-btn" type="button"><span aria-hidden="true">▦</span> Scan to order</button>
+          <button class="cart-trigger" id="cart-btn" type="button" aria-label="Open shopping cart">🛍 <span>Cart</span> <b id="cart-count">0</b></button>
+        </div>
+      </div>
+    </header>
+    <main>
+      <section class="hero shell" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <span class="eyebrow"><span class="bolt">ϟ</span> FRESH OFFERINGS • REAL ENERGY</span>
+          <h1 id="hero-title">CRAVE<br /><em>THE BLAZE.</em></h1>
+          <p class="hero-tagline">Fuel your day <strong>with flavour!</strong></p>
+          <p class="hero-description">Big flavour. Fresh ingredients. Good vibes. Your next favourite wings, wrap or tropical blend is just a tap away.</p>
+          <div class="hero-cta">
+            <a href="#menu" class="button button-primary">Explore the menu <span aria-hidden="true">↗</span></a>
+            <a href="#combos" class="button button-outline">See the combos</a>
+          </div>
+          <div class="hero-highlights"><span>🍃 Made fresh</span><span>⚡ Energy boosting</span><span>♥ Good vibes</span></div>
+        </div>
+        <div class="hero-art">
+          <div class="hero-halo"></div>
+          <div class="hero-image-wrap"><img src="https://images.unsplash.com/photo-1602253057119-44d745d9b860?auto=format&fit=crop&w=1100&q=85" alt="Glazed chicken wings served with fresh herbs" fetchpriority="high" /></div>
+          <div class="hero-sticker sticker-top">100%<br /><strong>FLAVOUR</strong></div>
+          <div class="hero-sticker sticker-bottom">FRESH.<br />FAST.<br /><strong>FLAVOUR PACKED.</strong></div>
+          <div class="sparkle sparkle-one">✦</div><div class="sparkle sparkle-two">✳</div>
+        </div>
+      </section>
+      <div class="marquee" aria-label="Boot-Up Café highlights"><div class="marquee-inner"><span>⚡ BOOT UP YOUR DAY</span><span>✦ FRESH MADE DAILY</span><span>♥ GOOD VIBES ONLY</span><span>⚡ FLAVOUR PACKED</span><span>✦ BOOT UP YOUR DAY</span><span>♥ GOOD VIBES ONLY</span></div></div>
+      <section class="menu-section shell" id="menu" aria-labelledby="menu-title">
+        <div class="section-top"><div><span class="eyebrow">THE GOOD STUFF</span><h2 id="menu-title">PICK YOUR <em>CRAVING.</em></h2><p>Everything you love from our menu. Tap anything to make it yours.</p></div><div class="menu-note"><span class="note-dot"></span> Prices in JMD</div></div>
+        <div class="menu-controls" id="category-tabs" role="group" aria-label="Filter menu categories"></div>
+        <div class="menu-grid" id="product-grid" aria-live="polite"></div>
+        <div class="menu-footnote">* Product photographs are illustrative. Please tell us about food allergies before you order.</div>
+      </section>
+      <section class="combos-section" id="combos" aria-labelledby="combo-title"><div class="shell">
+        <div class="section-top"><div><span class="eyebrow">MORE FLAVOUR. BETTER VALUE.</span><h2 id="combo-title">ULTIMATE <em>COMBOS.</em></h2><p>Pair your favourites and power up the flavour.</p></div><span class="combo-stamp">⚡ FUEL UP</span></div>
+        <div class="combo-grid" id="combo-grid"></div>
+      </div></section>
+      <section class="how-section shell" aria-labelledby="how-title">
+        <div class="section-top"><div><span class="eyebrow">SO EASY, SO GOOD</span><h2 id="how-title">HOW TO <em>BOOT-UP.</em></h2></div></div>
+        <div class="steps"><article><span>01</span><div class="step-icon">👆</div><h3>Tap your favourites</h3><p>Choose wings, wraps, tropical blends or a combo.</p></article><article><span>02</span><div class="step-icon">✨</div><h3>Make it yours</h3><p>Select flavours, sizes and any ingredient changes.</p></article><article><span>03</span><div class="step-icon">💬</div><h3>Send via WhatsApp</h3><p>Review your order and send it directly to the café.</p></article></div>
+      </section>
+      <section class="closing-section" id="about"><div class="shell closing-inner"><div><span class="eyebrow">READY TO RECHARGE?</span><h2>GOOD FOOD.<br /><em>GREAT ENERGY.</em></h2><p>Freshly prepared. Bursting with flavour. Made with love.</p><a href="#menu" class="button button-primary">Let's order <span aria-hidden="true">↗</span></a></div><div class="closing-icon" aria-hidden="true">⚡</div></div></section>
+    </main>
+    <footer><div class="shell footer-inner"><div class="footer-brand"><img src="./assets/bootup-icon.svg" alt="" width="38" height="38"/><strong>BOOT-UP CAFÉ</strong></div><p>Fuel your day with flavor! • Prices in Jamaican dollars.</p><div class="footer-links"><button id="footer-qr" type="button">QR code</button><a href="https://wa.me/18763040394" target="_blank" rel="noopener">WhatsApp</a></div><small>© <span id="year"></span> Boot-Up Café</small></div></footer>
+  </div>
+  <button type="button" id="mobile-cart" class="mobile-cart" aria-label="Open cart"><span>🛍 View cart</span><span id="mobile-cart-summary">0 items</span></button>
+  <div id="overlay" class="overlay" hidden></div>
+  <div id="dialog-root" class="dialog-root" aria-live="polite"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>
