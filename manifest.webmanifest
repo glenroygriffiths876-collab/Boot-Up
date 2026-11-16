@@ -1,0 +1,33 @@
+{
+  "name": "BOOT-UP CAFÉ — Order Your Favourites",
+  "short_name": "BOOT-UP",
+  "description": "Wings, wraps, blended juices and flavour-packed combos. Customise and send your order on WhatsApp.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#05091b",
+  "theme_color": "#080d23",
+  "orientation": "any",
+  "lang": "en-JM",
+  "icons": [
+    {
+      "src": "./assets/bootup-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Order from Menu",
+      "short_name": "Menu",
+      "url": "./#menu"
+    },
+    {
+      "name": "See Combos",
+      "short_name": "Combos",
+      "url": "./#combos"
+    }
+  ]
+}
