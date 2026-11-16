@@ -27,3 +27,12 @@ footer{padding:31px 0 34px;background:#040817}.footer-inner{display:flex;align-i
 .product-visual:after{z-index:2}
 .product-tag{z-index:3}
 @media(max-width:380px){.shell{width:calc(100% - 24px)}.hero h1{font-size:72px}.menu-grid{gap:8px}.product-body{padding:11px 9px}.product-title{font-size:20px}.product-visual{height:117px}.add-button{font-size:10px;padding:8px}}
+
+/* Poster-inspired floating wrap and blended juice around the hero wings. */
+.hero-mini{position:absolute;z-index:2;width:147px;height:147px;border-radius:50%;overflow:hidden;border:7px solid #101b48;box-shadow:0 0 0 4px #f33480,0 18px 35px rgba(0,0,0,.5)}
+.hero-mini img{width:100%;height:100%;object-fit:cover}
+.hero-mini-wrap{right:-15px;bottom:4px;transform:rotate(9deg)}
+.hero-mini-juice{left:-10px;top:48px;width:112px;height:112px;box-shadow:0 0 0 4px #3a65fa,0 17px 30px rgba(0,0,0,.5)}
+@media(max-width:1080px){.hero-mini-wrap{right:-8px;bottom:-6px;width:112px;height:112px}.hero-mini-juice{left:0;width:93px;height:93px}}
+@media(max-width:750px){.hero-mini-wrap{right:0;bottom:0;width:93px;height:93px}.hero-mini-juice{left:3px;top:10px;width:83px;height:83px}}
+@media(max-width:380px){.hero-mini-wrap{width:80px;height:80px}.hero-mini-juice{width:71px;height:71px}}
