@@ -36,3 +36,16 @@ footer{padding:31px 0 34px;background:#040817}.footer-inner{display:flex;align-i
 @media(max-width:1080px){.hero-mini-wrap{right:-8px;bottom:-6px;width:112px;height:112px}.hero-mini-juice{left:0;width:93px;height:93px}}
 @media(max-width:750px){.hero-mini-wrap{right:0;bottom:0;width:93px;height:93px}.hero-mini-juice{left:3px;top:10px;width:83px;height:83px}}
 @media(max-width:380px){.hero-mini-wrap{width:80px;height:80px}.hero-mini-juice{width:71px;height:71px}}
+
+/* November 2026 product photography upgrade: poster-inspired photographic cards. */
+.product-visual{background:#0c1633}
+.product-visual img{object-fit:cover;object-position:50% 49%;width:100%;height:100%;filter:saturate(1.09) contrast(1.025)}
+.product-visual:after{background:linear-gradient(to top,rgba(5,9,27,.28),transparent 58%)}
+.product-visual .product-emoji{font-size:52px;opacity:.12}
+.combo-photo{position:relative;overflow:hidden;aspect-ratio:1.7;width:100%;margin:14px 0 11px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:radial-gradient(circle,#2e2754,#0b1331);box-shadow:0 13px 22px rgba(0,0,0,.19)}
+.combo-photo img{height:100%;width:100%;object-fit:cover;object-position:center;transition:transform .35s,filter .35s;filter:saturate(1.1)}
+.combo-card:hover .combo-photo img{transform:scale(1.07);filter:saturate(1.18)}
+.combo-bolt{position:absolute;right:9px;top:9px;display:grid;place-items:center;width:35px;height:35px;border-radius:50%;background:#ec2878;box-shadow:0 0 14px rgba(242,45,117,.5);font-size:18px}
+.combo-card .combo-name{max-width:none;font-size:clamp(18px,2vw,24px);min-height:49px}
+.combo-card .combo-bottom{margin-top:auto}
+@media(max-width:500px){.combo-card .combo-name{font-size:19px;min-height:62px}.combo-photo{margin:10px 0}.combo-bolt{width:29px;height:29px;font-size:15px;right:6px;top:6px}.combo-card{min-height:0}}

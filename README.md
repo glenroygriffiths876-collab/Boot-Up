@@ -95,3 +95,11 @@ The customer must always see a clear difference between **draft**, **sent by the
 ---
 
 Built for **BOOT-UP CAFÉ** — *Fuel your day with flavor!*
+
+## Food photography upgrade — November 2026
+
+The product-photo experience now uses **15 optimized, locally hosted WebP food images**, based on original visual assets created for this project. The chickpea wrap, ackee wrap, fried plantain, wings, drinks and combos now use photographic/composite food art instead of emoji placeholders. The corn-on-the-cob card uses a free-to-use Unsplash food photograph by [Tim Mossholder](https://unsplash.com/photos/grilled-corn-on-the-cob-on-a-grill-wK5yQGZmK8U).
+
+These assets are **illustrative product concepts, not photographs of Boot-Up's actual prepared meals**. Confirm food presentation and ingredients with the business before marketing them as representative of actual servings.
+
+The source code keeps all product IDs, prices, checkout logic and WhatsApp number unchanged. The service-worker cache version was advanced to v3 so installed users can receive the updated images.

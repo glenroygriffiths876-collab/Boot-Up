@@ -48,7 +48,7 @@ function renderProducts() {
 }
 function renderCombos() {
   $('#combo-grid').innerHTML = COMBOS.map((p,i)=>`<article class="combo-card"><span class="combo-no">POWER COMBO 0${i+1}</span>
-  <h3 class="combo-name">${html(p.name)}</h3><div class="combo-emoji" aria-hidden="true">${p.emoji} ⚡</div>
+  <h3 class="combo-name">${html(p.name)}</h3><div class="combo-photo"><img src="${html(p.image)}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true" /><span class="combo-bolt" aria-hidden="true">⚡</span></div>
   <div class="combo-bottom"><span class="combo-price">${money(p.price)}</span><button type="button" data-open="${p.id}">Build combo +</button></div></article>`).join('');
 }
 function showToast(message) {

@@ -30,3 +30,11 @@ test('cart tallies sizes, quantities, combos correctly',()=>{
 test('all configurable menu items have unique ids',()=>{
  assert.equal(new Set(ALL_ITEMS.map(x=>x.id)).size,ALL_ITEMS.length);
 });
+
+test('every advertised product and combo has a meaningful image source',()=>{
+ assert.ok([...PRODUCTS,...COMBOS].every(p=>typeof p.image==='string' && p.image.length>8));
+ const verify = [...PRODUCTS,...COMBOS].filter(p=>p.image.startsWith('./assets/'));
+ for(const item of verify) {
+   assert.ok(item.image.endsWith('.webp'),item.id+' should use an optimized food photograph');
+ }
+});
