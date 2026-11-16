@@ -1,6 +1,6 @@
 /* Boot-Up Café lightweight offline shell: never queues or pretends to send orders. */
-const CACHE = 'bootup-v1';
-const SHELL = ['./','./index.html','./styles.css','./main.js','./catalog.js','./assets/bootup-icon.svg','./manifest.webmanifest'];
+const CACHE = 'bootup-v2';
+const SHELL = ['./','./index.html','./styles.css','./main.js','./catalog.js','./assets/bootup-icon.svg','./assets/icon-192.png','./assets/icon-512.png','./manifest.webmanifest'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
 });
