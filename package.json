@@ -1,0 +1,14 @@
+{
+  "name": "bootup-cafe",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Boot-Up Café poster-inspired WhatsApp ordering web app",
+  "scripts": {
+    "test": "node --test",
+    "check": "node --check main.js && node --check catalog.js && node --check sw.js && node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
