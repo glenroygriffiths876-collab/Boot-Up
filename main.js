@@ -1,4 +1,4 @@
-import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal } from './catalog.js';
+import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js';
 
 const $ = selector => document.querySelector(selector);
 const html = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -18,6 +18,9 @@ let filter = 'all';
 let activeProductId = null;
 let editingIndex = -1;
 let previewMessage = '';
+let checkoutDraft = null;
+let receiptFile = null;
+let draftRef = '';
 let toastTimer;
 let focusReturn = null;
 
@@ -66,6 +69,7 @@ function openDialog(title, body, footer='', drawer=false) {
   $('#close-dialog')?.focus();
 }
 function closeDialog() {
+  checkoutDraft=null; receiptFile=null; draftRef=''; previewMessage='';
   $('#overlay').hidden=true; $('#dialog-root').innerHTML=''; $('#dialog-root').className='dialog-root';
   document.body.classList.remove('locked'); activeProductId=null; editingIndex=-1;
   if(focusReturn && focusReturn.isConnected) focusReturn.focus();
@@ -157,11 +161,34 @@ function cartHTML() {
   }).join('')}</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><strong>${money(calculateTotal(cart))}</strong></div><div class="summary-row total"><span>Order total</span><strong>${money(calculateTotal(cart))}</strong></div><p class="muted-help">No delivery or additional charges have been included. Special requests and availability require café confirmation.</p></div>`;
 }
 function openCart() {
+  checkoutDraft=null; receiptFile=null; draftRef=''; previewMessage='';
   const footer=cart.length?`<button class="button button-primary full-width" id="go-checkout" type="button">Continue to checkout ↗</button>`:'';
   openDialog('Your flavour bag',cartHTML(),footer,true);
 }
 function paymentOptions() {
-  return `<option value="Arrange payment via WhatsApp">Arrange payment via WhatsApp</option><option value="Request bank transfer details">Request bank transfer details</option>`;
+  return '<option value="">Choose payment method</option><option value="'+PAYMENT.CASH+'">'+PAYMENT.CASH+'</option>'+(BUSINESS.bankTransferEnabled?'<option value="'+PAYMENT.BANK+'">'+PAYMENT.BANK+'</option>':'');
+}
+function bankPanel() {
+  return `<section id="bank-panel" class="bank-panel" hidden aria-label="Bank transfer instructions">
+    <h3>🏦 Bank transfer details</h3>
+    <dl><dt>Bank</dt><dd>${html(BUSINESS.bankName)}</dd><dt>Account holder</dt><dd>${html(BUSINESS.accountName)}</dd><dt>Account number</dt><dd>${html(BUSINESS.accountNumber)} <button type="button" class="bank-copy" id="copy-account">Copy</button></dd><dt>Branch</dt><dd>${html(BUSINESS.branch)}</dd><dt>Account type</dt><dd>${html(BUSINESS.accountType)}</dd></dl>
+    <div class="summary-row total"><span>Menu total</span><strong>${money(calculateTotal(cart))}</strong></div>
+    <p class="muted-help">Confirm availability and the final amount with the café before transferring. <a href="https://wa.me/${BUSINESS.whatsapp}" target="_blank" rel="noopener noreferrer">Contact Boot-Up ↗</a></p>
+    <label for="receipt-file" class="field-title">Attach proof of payment <span class="required">*</span></label>
+    <input type="file" class="field-input" id="receipt-file" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" disabled />
+    <p class="muted-help">Select a transfer screenshot or PDF (up to 10 MB). The file stays on your device until you share it. Hide unrelated balances or transactions before sharing.</p>
+    <div id="receipt-status" class="muted-help" role="status" aria-live="polite"></div>
+    <button type="button" class="bank-copy" id="remove-receipt" hidden>Remove attachment</button>
+  </section>`;
+}
+function syncPayment() {
+  const bank=$('#payment')?.value===PAYMENT.BANK;
+  const panel=$('#bank-panel'),input=$('#receipt-file');
+  if(!panel||!input)return;
+  panel.hidden=!bank;input.disabled=!bank;
+  if(!bank){receiptFile=null;input.value='';}
+  $('#receipt-status').textContent=receiptFile?'Selected: '+receiptFile.name:'No receipt selected.';
+  $('#remove-receipt').hidden=!receiptFile;
 }
 function checkoutHTML() {
   return `<div class="checkout-progress"><b>1. YOUR DETAILS</b> → 2. WHATSAPP ORDER</div>
@@ -176,7 +203,8 @@ function checkoutHTML() {
   <div id="allergy-detail" hidden><label class="field-title" for="allergy-description">Describe your allergy *</label><textarea id="allergy-description" name="allergyDescription" class="field-input" rows="2" maxlength="400" placeholder="Ingredients or foods you must avoid"></textarea></div>
   <p class="muted-help">Allergen requests require café review. Cross-contact cannot be ruled out without explicit confirmation.</p></fieldset>
   <div class="form-field"><label for="pickup">Collection preference</label><select id="pickup" name="pickup" class="field-input"><option value="Pickup time to be confirmed">Pickup — time to be confirmed</option><option value="Request earliest available pickup">Request earliest available pickup</option></select></div>
-  <div class="form-field"><label for="payment">Payment</label><select id="payment" name="payment" class="field-input">${paymentOptions()}</select><p class="muted-help">Bank details and payment methods must be confirmed directly by the café. Do not transfer to an unverified account.</p></div>
+  <div class="form-field"><label for="payment">Payment method <span class="required">*</span></label><select id="payment" name="payment" class="field-input" required>${paymentOptions()}</select><p class="muted-help">Cash is paid when receiving your order. Collection or delivery arrangements require café confirmation.</p></div>
+  ${bankPanel()}
   <div class="form-field"><label for="order-notes">General order instructions</label><textarea id="order-notes" name="notes" class="field-input" maxlength="450" placeholder="Additional helpful details (optional)"></textarea></div>
   <div class="summary-row total"><span>Order total</span><strong>${money(calculateTotal(cart))}</strong></div>
   <p class="validation-error" id="checkout-error" role="alert"></p>
@@ -185,6 +213,18 @@ function checkoutHTML() {
 function openCheckout() {
   if(!cart.length) return openCart();
   openDialog('Finalise your order',checkoutHTML(),`<div class="order-actions"><button class="button button-outline" id="back-to-cart" type="button">← Back to bag</button><button class="button button-primary" id="review-order" type="button">Review WhatsApp order ↗</button></div>`,true);
+  restoreCheckout();
+}
+function restoreCheckout() {
+  if(checkoutDraft){
+    const form=$('#checkout-form');
+    for(const [key,value] of Object.entries(checkoutDraft)){
+      if(key==='allergy'){for(const el of form.querySelectorAll('[name="allergy"]'))el.checked=el.value===value;}
+      else if(form.elements.namedItem(key))form.elements.namedItem(key).value=value;
+    }
+    $('#allergy-detail').hidden=checkoutDraft.allergy!=='Food allergy declared';
+  }
+  syncPayment();
 }
 function reference() {
   const date=new Date();
@@ -195,14 +235,16 @@ function reference() {
   return 'BU-'+ymd+'-'+Array.from(bits,b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
 }
 function buildMessage(details) {
-  const lines=[`⚡ BOOT-UP CAFÉ — ORDER REQUEST`,`Draft reference: ${reference()}`,`Name: ${details.name}`,`Phone: ${details.phone}`,'', '🛍 MY ORDER'];
+  const lines=[`⚡ BOOT-UP CAFÉ — ORDER REQUEST`,`Draft reference: ${draftRef || (draftRef=reference())}`,`Name: ${details.name}`,`Phone: ${details.phone}`,'', '🛍 MY ORDER'];
   cart.forEach((line,i)=>{
     const item=findItem(line.id);
     lines.push(`${i+1}. ${line.quantity} × ${item.name} — ${money(priceFor(item,line.options)*line.quantity)}`);
     const summary=optionSummary(line.options);
     if(summary) lines.push('   '+summary);
   });
-  lines.push('',`TOTAL: ${money(calculateTotal(cart))}`,`Collection: ${details.pickup}`,`Payment: ${details.payment} (not verified)`,'',`⚠️ ALLERGY DECLARATION: ${details.allergy}`);
+  lines.push('',`TOTAL: ${money(calculateTotal(cart))}`,`Collection: ${details.pickup}`,`Payment: ${details.payment}`,'',`⚠️ ALLERGY DECLARATION: ${details.allergy}`);
+  if(details.payment===PAYMENT.BANK) lines.push('PAYMENT STATUS: Transfer receipt selected; please check the attachment in WhatsApp and verify payment.');
+  else lines.push('PAYMENT STATUS: Cash due when receiving the order.');
   if(details.allergyDescription) lines.push(`ALLERGY DETAILS: ${details.allergyDescription}`);
   if(details.notes) lines.push(`Other instructions: ${details.notes}`);
   lines.push('','This is an order request. Please confirm availability, pickup time, allergy requirements, payment details and final acceptance.','Sent from the Boot-Up Café digital menu.');
@@ -217,7 +259,14 @@ function reviewCheckout() {
   if(phone.replace(/\D/g,'').length<7){error.textContent='Please enter a valid telephone number.';$('#customer-phone').focus();return;}
   if(!allergy){error.textContent='Please choose your allergy declaration.';form.querySelector('[name="allergy"]').focus();return;}
   if(allergy==='Food allergy declared' && !allergyDescription){error.textContent='Please describe your allergy so the café can review it.';$('#allergy-description').focus();return;}
+  const payment=fd.get('payment');
+  if(![PAYMENT.CASH,PAYMENT.BANK].includes(payment)){error.textContent='Please choose your payment method.';$('#payment').focus();return;}
+  if(payment===PAYMENT.BANK){
+    const issue=receiptError(receiptFile);
+    if(issue){error.textContent=issue;$('#receipt-file').focus();return;}
+  } else receiptFile=null;
   error.textContent='';
+  checkoutDraft=Object.fromEntries(fd.entries());
   previewMessage=buildMessage({
     name,phone,allergy,allergyDescription,pickup:fd.get('pickup'),payment:fd.get('payment'),notes:(fd.get('notes')||'').trim()
   });
@@ -225,10 +274,25 @@ function reviewCheckout() {
   const body=`<div class="checkout-progress"><b>2. REVIEW YOUR REQUEST</b> → SEND IN WHATSAPP</div>
     <div class="alert warning"><strong>Important:</strong> This is an unsent draft. Opening WhatsApp does not send it automatically. Tap Send inside WhatsApp and wait for the café to confirm acceptance.</div>
     <pre class="order-preview">${html(previewMessage)}</pre>
-    <div class="alert">If you pay by bank transfer, ask the café for verified banking details first. Attach your transfer receipt directly in WhatsApp after the transfer. This website does not store or verify receipts.</div>`;
-  const footer=`<a class="button button-primary full-width" id="send-whatsapp" href="${html(url)}" target="_blank" rel="noopener noreferrer">💬 Open WhatsApp & send order ↗</a>
+    ${payment===PAYMENT.BANK?`<div class="alert success"><strong>📎 Receipt selected:</strong> ${html(receiptFile.name)}<br />Not yet sent or verified. Share the receipt and order in WhatsApp; choose Boot-Up Café (+1 876 304 0394) as the recipient. If file sharing is unavailable, open the café chat and attach the same receipt there manually.</div>`:'<div class="alert">Cash on delivery / collection selected. No receipt required.</div>'}`;
+  const shareData=payment===PAYMENT.BANK?{files:[receiptFile],text:previewMessage}:null;
+  const canShare=shareData&&supportsReceiptShare(shareData);
+  const footer=`${canShare?'<button class="button button-primary full-width" id="share-receipt-order" type="button">📎 Share order + receipt via WhatsApp</button>':''}
+    <a class="button ${canShare?'button-outline':'button-primary'} full-width" id="send-whatsapp" href="${html(url)}" target="_blank" rel="noopener noreferrer">${payment===PAYMENT.BANK?'💬 Open café chat & attach receipt manually ↗':'💬 Open WhatsApp & send order ↗'}</a>
     <div class="order-actions"><button class="button button-outline" id="copy-order" type="button">Copy order</button><button class="button button-outline" id="back-to-checkout" type="button">← Edit details</button></div>`;
   openDialog('Review your order',body,footer,true);
+}
+function supportsReceiptShare(data){
+  try{return !!(navigator.share && navigator.canShare && navigator.canShare(data));}catch{return false;}
+}
+async function shareReceiptOrder(){
+  if(!receiptFile||!previewMessage)return;
+  const data={files:[receiptFile],text:previewMessage};
+  if(!supportsReceiptShare(data)){showToast('Open the café chat and attach your receipt manually.');return;}
+  try{
+    await navigator.share(data);
+    showToast('Check WhatsApp: send both the order and receipt to Boot-Up Café.');
+  }catch(e){if(e?.name!=='AbortError')showToast('File sharing unavailable. Use the café chat and attach manually.');}
 }
 function siteURL(){return new URL('./',location.href.split('#')[0]).href;}
 function openQR(){
@@ -277,6 +341,9 @@ function click(event) {
   if(target.id==='back-to-cart'){openCart();return;}
   if(target.id==='review-order'){reviewCheckout();return;}
   if(target.id==='back-to-checkout'){openCheckout();return;}
+  if(target.id==='copy-account'){copyText(BUSINESS.accountNumber);return;}
+  if(target.id==='remove-receipt'){receiptFile=null;$('#receipt-file').value='';syncPayment();return;}
+  if(target.id==='share-receipt-order'){shareReceiptOrder();return;}
   if(target.id==='copy-order'){copyText(previewMessage);return;}
   if(target.id==='copy-site'){copyText(siteURL());return;}
   if(target.id==='print-qr-btn'){window.print();return;}
@@ -284,6 +351,14 @@ function click(event) {
 document.addEventListener('click',click);
 document.addEventListener('change',event=>{
   if(event.target.closest('#customize-form'))updateCustomizePrice();
+  if(event.target.id==='payment'){syncPayment();$('#checkout-error').textContent='';}
+  if(event.target.id==='receipt-file'){
+    const next=event.target.files?.[0];
+    if(!next)return;
+    const issue=receiptError(next);
+    if(issue){receiptFile=null;event.target.value='';}else receiptFile=next;
+    syncPayment();$('#checkout-error').textContent=issue;
+  }
   if(event.target.name==='allergy') {
     const details=$('#allergy-detail');
     if(details) details.hidden=event.target.value!=='Food allergy declared';

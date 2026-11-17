@@ -49,3 +49,16 @@ footer{padding:31px 0 34px;background:#040817}.footer-inner{display:flex;align-i
 .combo-card .combo-name{max-width:none;font-size:clamp(18px,2vw,24px);min-height:49px}
 .combo-card .combo-bottom{margin-top:auto}
 @media(max-width:500px){.combo-card .combo-name{font-size:19px;min-height:62px}.combo-photo{margin:10px 0}.combo-bolt{width:29px;height:29px;font-size:15px;right:6px;top:6px}.combo-card{min-height:0}}
+
+/* Checkout payment details */
+.bank-panel{padding:16px;border:1px solid var(--line);border-radius:16px;background:#121d40;min-width:0}
+.bank-panel[hidden],.bank-copy[hidden]{display:none}
+.bank-panel h3{font-size:16px;margin:0 0 12px;color:#fff}
+.bank-panel dl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:10px;margin:0;font-size:13px}
+.bank-panel dt{color:var(--muted)}.bank-panel dd{margin:0;color:#fff;font-weight:800;overflow-wrap:anywhere}
+.bank-panel a{color:#ffd0e0;text-decoration:underline}
+.bank-copy{border:1px solid var(--line);background:#26335b;color:#fff;border-radius:8px;padding:7px 10px;font-size:12px;margin:3px 0}
+.bank-panel .field-input[type=file]{font-size:12px;padding:9px;max-width:100%}
+.bank-panel input::file-selector-button{border:0;border-radius:8px;padding:8px;background:#54204a;color:#fff;margin-right:6px}
+#receipt-status{overflow-wrap:anywhere;margin:8px 0}
+.dialog-footer #share-receipt-order{margin-bottom:8px}

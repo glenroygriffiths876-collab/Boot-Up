@@ -4,11 +4,12 @@ export const BUSINESS = Object.freeze({
   name: 'BOOT-UP CAFÉ',
   whatsapp: '18763040394',
   currency: 'JMD',
-  bankTransferEnabled: false,
-  bankName: '',
-  accountName: '',
-  accountNumber: '',
-  branch: '',
+  bankTransferEnabled: true,
+  bankName: 'Scotiabank',
+  accountName: 'Denise Lewin',
+  accountNumber: '100414586',
+  branch: 'Negril Branch',
+  accountType: 'Savings',
   hours: '',
   address: '',
   includedComboJuiceSize: null // owner must confirm size for advertised Sunrise Energy combos
@@ -88,4 +89,14 @@ export function calculateTotal(cart) {
     if (!item || item.available === false) return sum;
     return sum + priceFor(item, line.options) * Math.max(0, Number(line.quantity) || 0);
   }, 0);
+}
+
+export const PAYMENT = Object.freeze({ CASH:'Cash on delivery / collection (COD)', BANK:'Bank transfer' });
+export function receiptError(file) {
+  if (!file || !file.size) return 'Please attach your transfer receipt or screenshot.';
+  if (file.size > 10*1024*1024) return 'Your receipt must be 10 MB or smaller.';
+  const ext = /\.(jpe?g|png|webp|pdf|heic|heif)$/i.test(file.name || '');
+  const mime = /^(image\/(jpeg|png|webp|heic|heif)|application\/pdf)$/i.test(file.type || '');
+  if (!ext || (file.type && !mime && file.type !== 'application/octet-stream')) return 'Choose a JPG, PNG, WebP, HEIC or PDF receipt.';
+  return '';
 }

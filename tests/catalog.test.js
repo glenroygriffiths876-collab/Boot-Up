@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PRODUCTS,COMBOS,ALL_ITEMS,JUICE_SIZES,MILK_SIZES,priceFor,calculateTotal } from '../catalog.js';
+import { PRODUCTS,COMBOS,ALL_ITEMS,JUICE_SIZES,MILK_SIZES,priceFor,calculateTotal,PAYMENT,receiptError,BUSINESS } from '../catalog.js';
 
 test('poster wing and wrap prices',()=>{
  assert.equal(PRODUCTS.find(p=>p.id==='wings5').price,800);
@@ -37,4 +37,21 @@ test('every advertised product and combo has a meaningful image source',()=>{
  for(const item of verify) {
    assert.ok(item.image.endsWith('.webp'),item.id+' should use an optimized food photograph');
  }
+});
+
+test('checkout supports cash and the configured transfer account',()=>{
+ assert.equal(BUSINESS.bankTransferEnabled,true);
+ assert.equal(BUSINESS.bankName,'Scotiabank');
+ assert.equal(BUSINESS.accountType,'Savings');
+ assert.notEqual(PAYMENT.CASH,PAYMENT.BANK);
+});
+test('transfer receipt accepts supported files and rejects invalid or oversized ones',()=>{
+ assert.ok(receiptError(null));
+ assert.ok(receiptError({name:'receipt.png',type:'image/png',size:0}));
+ assert.ok(receiptError({name:'receipt.exe',type:'application/octet-stream',size:1}));
+ assert.ok(receiptError({name:'receipt.pdf',type:'text/html',size:10}));
+ assert.ok(receiptError({name:'receipt.png',type:'image/png',size:10*1024*1024+1}));
+ assert.equal(receiptError({name:'receipt.png',type:'image/png',size:100}),'');
+ assert.equal(receiptError({name:'receipt.pdf',type:'application/pdf',size:100}),'');
+ assert.equal(receiptError({name:'receipt.HEIC',type:'',size:100}),'');
 });
