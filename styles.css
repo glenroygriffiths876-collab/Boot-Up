@@ -172,3 +172,11 @@ html{max-width:100%;overflow-x:clip}
 @media print{#app{overflow:visible}.dialog{display:block;overflow:visible;max-height:none;height:auto}.dialog-body{overflow:visible}.dialog-footer{display:none!important}}
 
 @media(max-width:750px){.dialog-root.compact-viewport .dialog,.dialog-root.compact-viewport .dialog.drawer{display:block;overflow:auto;overscroll-behavior:contain}.dialog-root.compact-viewport .dialog-body{overflow:visible}}
+
+@media(min-width:751px) and (max-width:1080px){
+  .hero h1{font-size:clamp(47px,7.8vw,84px);letter-spacing:-1.5px}
+  .header-content{gap:10px}
+  .desktop-nav{gap:18px}
+  .header-actions{gap:6px}
+  .header-actions .qr-trigger{padding-inline:9px}
+}
