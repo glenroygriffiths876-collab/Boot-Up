@@ -62,3 +62,113 @@ footer{padding:31px 0 34px;background:#040817}.footer-inner{display:flex;align-i
 .bank-panel input::file-selector-button{border:0;border-radius:8px;padding:8px;background:#54204a;color:#fff;margin-right:6px}
 #receipt-status{overflow-wrap:anywhere;margin:8px 0}
 .dialog-footer #share-receipt-order{margin-bottom:8px}
+
+/* Mobile fit: constrain layout, not just the viewport. Keep scroll inside the drawer. */
+html{max-width:100%;overflow-x:clip}
+#app{position:relative;isolation:isolate;overflow-x:clip;max-width:100%}
+.shell,.hero-copy,.hero-art,.section-top>div,.closing-inner>div,.header-content>*,
+.product-body,.combo-card,.combo-bottom,.product-bottom,.dialog,.dialog-body,.dialog-footer,
+.checkout-form,.checkout-form>*,#customize-form,.form-section,.form-field,.option-grid,.choice,
+.bank-panel,.summary-row>*{min-width:0}
+.hero{grid-template-columns:minmax(0,1fr) minmax(0,1.08fr)}
+.field-input{min-width:0;max-width:100%}
+.form-section{min-inline-size:0;max-inline-size:100%}
+.choice,.alert,.validation-error,.muted-help,.dialog-header h2,.product-title,.combo-name,
+.cart-item-info,.summary-row,.button,.add-button,.combo-card button{overflow-wrap:anywhere}
+.order-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+.button,.add-button,.combo-card button{min-width:0;max-width:100%;white-space:normal;text-align:center}
+.dialog{display:flex;flex-direction:column;overflow:hidden}
+.dialog-header,.dialog-footer{flex:0 0 auto;min-width:0}
+.dialog-header h2{min-width:0}
+.dialog-body{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scroll-padding-block:20px;-webkit-overflow-scrolling:touch}
+.dialog-footer{position:relative;bottom:auto}
+.dialog-footer .order-actions:first-child{margin-top:0}
+.order-preview{max-width:100%;min-width:0}
+.bank-panel .field-input[type=file]{width:100%;min-width:0;overflow:hidden}
+.cart-line-actions,.summary-row,.qr-actions,.modal-price-row,.checkout-progress{flex-wrap:wrap}
+.summary-row strong{margin-left:auto;text-align:right}
+@media(max-width:750px){
+  html{scroll-padding-top:83px}
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .hero h1{font-size:clamp(51px,12vw,110px);letter-spacing:-1.5px;overflow-wrap:normal}
+  .hero-image-wrap{width:min(88%,340px);height:min(77vw,300px)}
+  .hero-halo{width:min(82%,300px);height:min(77vw,300px)}
+  .section-top h2,.closing-section h2{font-size:clamp(36px,9vw,70px);overflow-wrap:normal}
+  .section-top{flex-wrap:wrap}
+  .hero-cta>*{max-width:100%}
+  .menu-controls{max-width:100%;overscroll-behavior-x:contain}
+  .header-content{gap:8px}
+  .header-actions{flex-shrink:0;gap:6px}
+  .brand{min-width:0;gap:7px}
+  .mobile-cart{left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));width:auto;max-width:520px;margin-inline:auto;transform:none;gap:10px;padding:12px 14px;min-height:48px}
+  .mobile-cart:active{transform:scale(.98)}
+  .mobile-cart span{min-width:0;overflow-wrap:anywhere}
+  .mobile-cart span:last-child{text-align:right}
+  .footer-inner{padding-bottom:calc(83px + env(safe-area-inset-bottom))}
+  body.locked .mobile-cart{visibility:hidden}
+  .dialog-root,.dialog-root.has-drawer{inset:0;top:var(--visible-top,0px);height:var(--visible-height,100dvh);padding:0;align-items:stretch;justify-content:center}
+  .dialog,.dialog.drawer{width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0;margin:0;border-inline:0}
+  .dialog-header{padding:calc(12px + env(safe-area-inset-top)) max(14px,env(safe-area-inset-right)) 12px max(14px,env(safe-area-inset-left))}
+  .dialog-header h2{font-size:clamp(25px,6.5vw,34px);line-height:1.08}
+  .close-button{width:44px;height:44px}
+  .dialog-body{padding:16px max(14px,env(safe-area-inset-right)) 20px max(14px,env(safe-area-inset-left))}
+  .dialog-footer{padding:10px max(14px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(14px,env(safe-area-inset-left))}
+  .dialog-footer .button{min-height:44px;padding:10px 12px;font-size:13px;line-height:1.25;gap:6px}
+  .dialog-footer .order-actions{gap:7px;margin-top:8px}
+  .dialog-footer #share-receipt-order{margin-bottom:6px}
+  .field-input{font-size:16px;padding:11px 12px}
+  .bank-panel .field-input[type=file]{font-size:16px}
+  .choice{min-height:44px;line-height:1.35}
+  .cart-line-actions button,.qty-picker button{min-width:44px;min-height:44px}
+  .bank-copy{min-height:44px}
+  .toast{bottom:calc(78px + env(safe-area-inset-bottom));width:max-content;max-width:calc(100% - 24px);overflow-wrap:anywhere}
+  body.locked .toast{bottom:calc(14px + env(safe-area-inset-bottom))}
+}
+@media(max-width:500px){
+  .product-bottom,.combo-bottom{align-items:stretch;flex-direction:column;gap:5px}
+  .product-bottom .add-button,.combo-bottom button{width:100%;min-height:44px;font-size:12px;padding:8px 6px}
+  .product-price,.combo-price{line-height:1.15}
+  .product-description{font-size:12px;min-height:0}
+  .product-title{font-size:23px}
+  .combo-card .combo-name{font-size:21px;min-height:0;flex:1}
+  .product-body{gap:4px}
+  .product-tag{left:7px;top:7px;font-size:9px;letter-spacing:.4px;padding:5px 7px;max-width:calc(100% - 14px)}
+  .hero h1{font-size:clamp(51px,13vw,85px)}
+  .hero-copy{padding:0}
+  .hero-description{font-size:14px}
+  .hero-cta .button{flex:1 1 135px;min-height:44px}
+  .hero-highlights{gap:8px}
+  .hero-highlights span{white-space:normal}
+  .form-section{padding:12px}
+  .form-section .option-grid{grid-template-columns:minmax(0,1fr)}
+  .order-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bank-panel{padding:12px}
+  .bank-panel dl{grid-template-columns:minmax(0,1fr) minmax(0,1.55fr);gap:8px}
+  .bank-panel dd{display:flex;align-items:center;flex-wrap:wrap;gap:3px 7px}
+  .dialog-price{font-size:27px}
+  .cart-item{padding:12px;gap:9px}
+  .cart-item-icon{width:42px;height:42px;font-size:25px}
+}
+@media(max-width:360px){
+  .shell{width:calc(100% - 24px)}
+  .menu-grid,.combo-grid{grid-template-columns:minmax(0,1fr)}
+  .product-visual{height:190px}
+  .product-body{padding:14px}
+  .product-bottom,.combo-bottom{flex-direction:row;align-items:center;flex-wrap:wrap}
+  .product-bottom .add-button,.combo-bottom button{width:auto;flex:1 1 115px}
+  .combo-card .combo-name{flex:auto}
+  .hero-mini-wrap{right:4px}
+  .hero-halo{width:77%}
+  .option-grid{grid-template-columns:minmax(0,1fr)}
+  .dialog-footer .order-actions{grid-template-columns:minmax(0,1fr)}
+  .bank-panel dl{grid-template-columns:minmax(0,1fr)}
+  .bank-panel dt:not(:first-child){margin-top:3px}
+  .cart-item-icon{display:none}
+}
+@media(max-width:750px) and (max-height:460px){
+  .dialog,.dialog.drawer{display:block;overflow:auto;overscroll-behavior:contain}
+  .dialog-body{overflow:visible}
+}
+@media print{#app{overflow:visible}.dialog{display:block;overflow:visible;max-height:none;height:auto}.dialog-body{overflow:visible}.dialog-footer{display:none!important}}
+
+@media(max-width:750px){.dialog-root.compact-viewport .dialog,.dialog-root.compact-viewport .dialog.drawer{display:block;overflow:auto;overscroll-behavior:contain}.dialog-root.compact-viewport .dialog-body{overflow:visible}}

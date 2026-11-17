@@ -58,6 +58,23 @@ function showToast(message) {
   const el = $('#toast'); clearTimeout(toastTimer); el.textContent=message; el.classList.add('visible');
   toastTimer=setTimeout(()=>el.classList.remove('visible'),2800);
 }
+// Use the visible viewport when the mobile keyboard or browser chrome changes height.
+function syncDialogViewport(){
+  const root=$('#dialog-root'),viewport=window.visualViewport;
+  if(!root)return;
+  if(viewport && window.matchMedia('(max-width: 750px)').matches && Math.abs(viewport.scale-1)<0.01){
+    root.style.setProperty('--visible-height',Math.round(viewport.height)+'px');
+    root.style.setProperty('--visible-top',Math.round(viewport.offsetTop)+'px');
+    root.classList.toggle('compact-viewport',viewport.height<460);
+    // A class assignment when opening a dialog resets compact-viewport; sync again after rendering.
+  }else{
+    root.style.removeProperty('--visible-height');root.style.removeProperty('--visible-top');
+    root.classList.remove('compact-viewport');
+  }
+}
+window.visualViewport?.addEventListener('resize',syncDialogViewport);
+window.visualViewport?.addEventListener('scroll',syncDialogViewport);
+window.addEventListener('resize',syncDialogViewport);
 function openDialog(title, body, footer='', drawer=false) {
   focusReturn = document.activeElement;
   $('#overlay').hidden=false;
@@ -66,7 +83,8 @@ function openDialog(title, body, footer='', drawer=false) {
   $('#dialog-root').innerHTML=`<section class="dialog ${drawer?'drawer':''}" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
     <div class="dialog-header"><h2 id="dialog-title">${title}</h2><button class="close-button" id="close-dialog" aria-label="Close dialog" type="button">×</button></div>
     <div class="dialog-body">${body}</div>${footer?`<div class="dialog-footer">${footer}</div>`:''}</section>`;
-  $('#close-dialog')?.focus();
+  syncDialogViewport();
+  $('#close-dialog')?.focus({preventScroll:true});
 }
 function closeDialog() {
   checkoutDraft=null; receiptFile=null; draftRef=''; previewMessage='';
