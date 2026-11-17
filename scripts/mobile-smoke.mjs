@@ -47,13 +47,27 @@ try{
       },selectors);
       assert.deepEqual(result,[],width+'x'+height+' '+label+': '+result.join('; '));
     }
-    await fits(['.header-content','.brand','.cart-trigger','.hero-copy','.hero-art','.section-top','.product-card','.product-body','.product-bottom','.add-button','.combo-card','.combo-bottom','.combo-card button','.mobile-cart'],'menu');
+    await fits(['.header-content','.brand','.cart-trigger','.hero-copy','.hero-art','.section-top','.product-card','.product-body','.product-bottom','.add-button','.combo-card','.combo-bottom','.combo-card button','.mobile-cart','#mobile-cart-summary','#mobile-cart-items','#mobile-cart-total'],'menu');
     await page.locator('button[data-open="wings5"]').click();
     await page.locator('#customize-form').waitFor();
     await fits(['.dialog','.dialog-header','.dialog-body','.dialog-footer','.choice','.field-input','#add-custom'],'customisation');
     await page.locator('input[name="flavour"]').first().check();
     await page.locator('#add-custom').click();
-    await page.locator('#cart-btn').click();
+    if(width<=750){
+      assert.equal(await page.locator('#mobile-cart-items').textContent(),'1 item');
+      assert.equal(await page.locator('#mobile-cart-total').textContent(),'J$800');
+      await page.evaluate(()=>window.scrollTo(0,document.documentElement.scrollHeight));
+      await page.waitForTimeout(300);
+      await fits(['.mobile-cart','#mobile-cart-summary','#mobile-cart-items','#mobile-cart-total'],'cart bar at page footer');
+      const geometry=await page.evaluate(()=>{
+        const bar=document.querySelector('#mobile-cart').getBoundingClientRect();
+        const v=window.visualViewport;
+        const children=[...document.querySelectorAll('#mobile-cart-items,#mobile-cart-total')].map(el=>el.getBoundingClientRect());
+        return {viewport:v.width,scrollX:window.scrollX,barLeft:bar.left,barRight:bar.right,childrenFit:children.every(r=>r.left>=bar.left-1&&r.right<=bar.right+1&&r.bottom<=bar.bottom+1)};
+      });
+      assert.ok(geometry.viewport<=width+1 && geometry.scrollX===0 && geometry.barLeft>=0 && geometry.barRight<=width+1 && geometry.childrenFit,JSON.stringify(geometry));
+      await page.locator('#mobile-cart').click();
+    }else await page.locator('#cart-btn').click();
     await fits(['.dialog','.cart-item','.cart-item-info','.cart-line-actions button','#go-checkout'],'cart');
     await page.locator('#go-checkout').click();
     await page.locator('#customer-name').fill('Layout Test');

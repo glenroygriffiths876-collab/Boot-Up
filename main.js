@@ -31,7 +31,14 @@ function persist() {
 function updateCartBadge() {
   const count = cart.reduce((sum,x)=>sum+x.quantity,0);
   $('#cart-count').textContent = String(count);
-  $('#mobile-cart-summary').textContent = String(count) + (count === 1 ? ' item' : ' items') + ' · ' + money(calculateTotal(cart));
+  const items=String(count)+(count===1?' item':' items');
+  const total=money(calculateTotal(cart));
+  // Retain compatibility with older cached HTML during service-worker updates.
+  if($('#mobile-cart-items') && $('#mobile-cart-total')){
+    $('#mobile-cart-items').textContent=items;
+    $('#mobile-cart-total').textContent=total;
+  }else $('#mobile-cart-summary').textContent=items+' · '+total;
+  $('#mobile-cart').setAttribute('aria-label','Open cart, '+items+', '+total);
 }
 function imageMarkup(p, className='product-visual') {
   return `<div class="${className} accent-${html(p.accent || 'pink')}"><span class="product-emoji" aria-hidden="true">${p.emoji}</span>${p.image ? `<img src="${html(p.image)}" alt="" loading="lazy" onerror="this.hidden=true" />` : ''}</div>`;

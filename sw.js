@@ -1,8 +1,8 @@
 /* Boot-Up Café lightweight offline shell: never queues or pretends to send orders. */
-const CACHE = 'bootup-v5-mobile-fit';
-const SHELL = ['./','./index.html','./styles.css?v=5','./main.js?v=5','./catalog.js','./assets/bootup-icon.svg','./assets/icon-192.png','./assets/icon-512.png','./manifest.webmanifest','./assets/menu/wings-5.webp','./assets/menu/wings-10.webp','./assets/menu/chicken-wrap.webp','./assets/menu/chickpea-wrap.webp','./assets/menu/ackee-wrap.webp','./assets/menu/fried-plantain.webp','./assets/menu/sunrise-energy.webp','./assets/menu/berry-power.webp','./assets/menu/green-fuel.webp','./assets/menu/tropical-bootup.webp','./assets/menu/milk-blended.webp','./assets/menu/combo-10-side.webp','./assets/menu/combo-5-side.webp','./assets/menu/combo-10-wrap.webp','./assets/menu/combo-5-wrap.webp'];
+const CACHE = 'bootup-v6-cart-viewport';
+const SHELL = ['./','./index.html','./styles.css?v=6','./main.js?v=6','./catalog.js','./assets/bootup-icon.svg','./assets/icon-192.png','./assets/icon-512.png','./manifest.webmanifest','./assets/menu/wings-5.webp','./assets/menu/wings-10.webp','./assets/menu/chicken-wrap.webp','./assets/menu/chickpea-wrap.webp','./assets/menu/ackee-wrap.webp','./assets/menu/fried-plantain.webp','./assets/menu/sunrise-energy.webp','./assets/menu/berry-power.webp','./assets/menu/green-fuel.webp','./assets/menu/tropical-bootup.webp','./assets/menu/milk-blended.webp','./assets/menu/combo-10-side.webp','./assets/menu/combo-5-side.webp','./assets/menu/combo-10-wrap.webp','./assets/menu/combo-5-wrap.webp'];
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL)).then(()=>self.skipWaiting()));
+  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL.map(url=>new Request(url,{cache:'reload'})))).then(()=>self.skipWaiting()));
 });
 self.addEventListener('activate',event=>{
   event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));

@@ -10,13 +10,13 @@
   <meta property="og:description" content="Tap, customise and order delicious wings, wraps, juice and combos in Jamaica." />
   <link rel="icon" type="image/svg+xml" href="./assets/bootup-icon.svg" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="stylesheet" href="./styles.css?v=5" />
+  <link rel="stylesheet" href="./styles.css?v=6" />
   <title>BOOT-UP CAFÉ | Fuel Your Day With Flavor</title>
 </head>
 <body>
-  <div class="ambient ambient-one" aria-hidden="true"></div>
-  <div class="ambient ambient-two" aria-hidden="true"></div>
   <div id="app">
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
     <header class="site-header" id="top">
       <div class="shell header-content">
         <a href="#top" class="brand" aria-label="Boot-Up Café home">
@@ -73,10 +73,10 @@
     </main>
     <footer><div class="shell footer-inner"><div class="footer-brand"><img src="./assets/bootup-icon.svg" alt="" width="38" height="38"/><strong>BOOT-UP CAFÉ</strong></div><p>Fuel your day with flavor! • Prices in Jamaican dollars.</p><div class="footer-links"><button id="footer-qr" type="button">QR code</button><a href="https://wa.me/18763040394" target="_blank" rel="noopener">WhatsApp</a></div><small>© <span id="year"></span> Boot-Up Café</small></div></footer>
   </div>
-  <button type="button" id="mobile-cart" class="mobile-cart" aria-label="Open cart"><span>🛍 View cart</span><span id="mobile-cart-summary">0 items</span></button>
+  <button type="button" id="mobile-cart" class="mobile-cart" aria-label="Open cart"><span class="mobile-cart-label">🛍 View cart</span><span id="mobile-cart-summary"><span id="mobile-cart-items">0 items</span><strong id="mobile-cart-total">J$0</strong></span></button>
   <div id="overlay" class="overlay" hidden></div>
   <div id="dialog-root" class="dialog-root" aria-live="polite"></div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script type="module" src="./main.js?v=5"></script>
+  <script type="module" src="./main.js?v=6"></script>
 </body>
 </html>
