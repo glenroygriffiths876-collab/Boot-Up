@@ -1,4 +1,4 @@
-import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js';
+import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js?v=7';
 
 const $ = selector => document.querySelector(selector);
 const html = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -40,11 +40,33 @@ function updateCartBadge() {
   }else $('#mobile-cart-summary').textContent=items+' · '+total;
   $('#mobile-cart').setAttribute('aria-label','Open cart, '+items+', '+total);
 }
+const icons = {
+  bag:'<path d="M4 7h16l1 14H3L4 7Z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/>',
+  bank:'<path d="m3 9 9-5 9 5H3Zm2 11h14M7 10v7m5-7v7m5-7v7"/>',
+  clip:'<path d="m8 13 6-6a3 3 0 0 1 4 4l-8 8a5 5 0 0 1-7-7l9-9"/>',
+  chat:'<path d="M21 11.5a9 9 0 0 1-9 9 9 9 0 0 1-4-.9L3 21l1.4-5a9 9 0 1 1 16.6-4.5Z"/><path d="M8 12h8"/>',
+  edit:'<path d="m14 5 5 5M4 20l4-1 12-12-4-4L4 15l0 5Z"/>',
+  trash:'<path d="M4 7h16M9 7V4h6v3M6 7l1 14h10l1-14M10 11v6m4-6v6"/>',
+  bolt:'<path d="m13 2-9 12h7l-1 8 10-12h-7l0-8Z"/>'
+};
+const uiIcon = name => `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${icons[name]||''}</svg>`;
+const categoryPhotos={all:'wings5',wings:'wings10',wraps:'wrap-chicken',sides:'corn',juices:'sunrise',milk:'milk-unconfigured'};
+const itemPhoto = item => {
+  if(!item?.image) return '';
+  // A composition of separate actual menu assets keeps the bottle consistent in both wrap combos.
+  if(item.includesSunrise){
+    const wings=findItem(item.wings===10?'wings10':'wings5');
+    const wrap=findItem(item.wings===10?'wrap-chicken':'wrap-chickpea');
+    const juice=findItem('sunrise');
+    return `<div class="meal-photo-composition" aria-hidden="true">${[wings,wrap,juice].map(x=>`<img src="${html(x.image)}" alt="" loading="lazy" decoding="async" />`).join('')}</div>`;
+  }
+  return `<img src="${html(item.image)}" alt="" loading="lazy" decoding="async" />`;
+};
 function imageMarkup(p, className='product-visual') {
-  return `<div class="${className} accent-${html(p.accent || 'pink')}"><span class="product-emoji" aria-hidden="true">${p.emoji}</span>${p.image ? `<img src="${html(p.image)}" alt="" loading="lazy" onerror="this.hidden=true" />` : ''}</div>`;
+  return `<div class="${className} accent-${html(p.accent || 'pink')}${p.category==='juices'||p.category==='milk'||p.id==='corn'?' photo-full':''}">${itemPhoto(p)}</div>`;
 }
 function renderCategories() {
-  $('#category-tabs').innerHTML = CATEGORIES.map(cat=>`<button class="filter-chip ${cat.id===filter?'active':''}" data-filter="${cat.id}" type="button" aria-pressed="${cat.id===filter}"><span aria-hidden="true">${cat.icon}</span> ${html(cat.title)}</button>`).join('');
+  $('#category-tabs').innerHTML = CATEGORIES.map(cat=>`<button class="filter-chip ${cat.id===filter?'active':''}" data-filter="${cat.id}" type="button" aria-pressed="${cat.id===filter}"><span class="filter-photo" aria-hidden="true">${itemPhoto(findItem(categoryPhotos[cat.id]))}</span><span class="filter-label">${html(cat.title)}</span></button>`).join('');
 }
 function renderProducts() {
   const shown = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p=>p.category===filter);
@@ -58,7 +80,7 @@ function renderProducts() {
 }
 function renderCombos() {
   $('#combo-grid').innerHTML = COMBOS.map((p,i)=>`<article class="combo-card"><span class="combo-no">POWER COMBO 0${i+1}</span>
-  <h3 class="combo-name">${html(p.name)}</h3><div class="combo-photo"><img src="${html(p.image)}" alt="" loading="lazy" decoding="async" onerror="this.hidden=true" /><span class="combo-bolt" aria-hidden="true">⚡</span></div>
+  <h3 class="combo-name">${html(p.name)}</h3><div class="combo-photo">${itemPhoto(p)}</div>
   <div class="combo-bottom"><span class="combo-price">${money(p.price)}</span><button type="button" data-open="${p.id}">Build combo +</button></div></article>`).join('');
 }
 function showToast(message) {
@@ -124,7 +146,7 @@ function openProduct(id, index=-1) {
   if(isCombo && product.pickWrap) optionsHTML+=`<label class="field-title" for="combo-wrap">Choose your wrap *</label><select id="combo-wrap" name="wrap" class="field-input"><option value="">Select a wrap</option>${WRAPS.map(w=>`<option ${o.wrap===w?'selected':''}>${html(w)}</option>`).join('')}</select><p class="muted-help">Describe wrap ingredient removals in the instructions below.</p>`;
   if(isCombo && product.includesSunrise) optionsHTML+=`<p class="alert">Includes <strong>Sunrise Energy</strong> (Orange, Pineapple, Coconut). The included drink size has not been confirmed by the café; it will be clarified before acceptance.</p>`;
   optionsHTML+=textField('Special preparation requests','specials','Tell us what to add, remove or change. Unpriced extras require confirmation.');
-  const content=`<div class="dialog-product-image">${product.image?`<img alt="" src="${html(product.image)}" onerror="this.replaceWith(document.createTextNode('${product.emoji}'))" />`:`<span>${product.emoji}</span>`}</div>
+  const content=`<div class="dialog-product-image${product.category==='juices'||product.category==='milk'||product.id==='corn'?' photo-full':''}">${itemPhoto(product)}</div>
   <p class="dialog-description">${html(product.description || 'A flavour-packed Boot-Up Café combo.')}</p>
   <form id="customize-form" novalidate>${optionsHTML}<div class="subsection"><span class="field-title">Quantity</span><div class="qty-picker"><button type="button" data-product-qty="-1" aria-label="Decrease quantity">−</button><strong id="product-qty">${saved?.quantity || 1}</strong><button type="button" data-product-qty="1" aria-label="Increase quantity">+</button></div></div>
   <p class="validation-error" id="customize-error" role="alert"></p></form>`;
@@ -163,7 +185,7 @@ function saveCustomized() {
     if(existing) existing.quantity=getQty(existing.quantity+qty);
     else cart.push(line);
   }
-  persist();closeDialog();showToast('Added to your Boot-Up order! ⚡');
+  persist();closeDialog();showToast('Added to your Boot-Up order!');
 }
 function optionSummary(options) {
   const out=[];
@@ -179,10 +201,10 @@ function optionSummary(options) {
   return out.join(' · ');
 }
 function cartHTML() {
-  if(!cart.length) return `<div class="empty-state"><div class="big-emoji">🛍</div><h3>Your bag is feeling empty</h3><p>It's time to power up your day with some flavour.</p><button class="button button-primary" type="button" id="continue-shopping">Explore the menu ↗</button></div>`;
+  if(!cart.length) return `<div class="empty-state"><div class="empty-cart-icon">${uiIcon('bag')}</div><h3>Your bag is feeling empty</h3><p>It's time to power up your day with some flavour.</p><button class="button button-primary" type="button" id="continue-shopping">Explore the menu ↗</button></div>`;
   return `<div class="cart-items">${cart.map((line,i)=>{
       const item=findItem(line.id);
-      return `<div class="cart-item"><div class="cart-item-icon">${item.emoji}</div><div class="cart-item-info"><strong>${html(item.name)}</strong><small>${html(optionSummary(line.options)) || 'Standard preparation'}</small><b>${money(priceFor(item,line.options)*line.quantity)}</b><div class="cart-line-actions"><button data-adjust="${i}" data-delta="-1" aria-label="Decrease quantity">−</button><span>${line.quantity}</span><button data-adjust="${i}" data-delta="1" aria-label="Increase quantity">+</button><button data-edit="${i}" aria-label="Edit item">✎</button><button data-remove="${i}" class="remove-line" aria-label="Remove item">×</button></div></div></div>`;
+      return `<div class="cart-item"><div class="cart-item-icon">${item.includesSunrise?itemPhoto(findItem('sunrise')):itemPhoto(item)}</div><div class="cart-item-info"><strong>${html(item.name)}</strong><small>${html(optionSummary(line.options)) || 'Standard preparation'}</small><b>${money(priceFor(item,line.options)*line.quantity)}</b><div class="cart-line-actions"><button data-adjust="${i}" data-delta="-1" aria-label="Decrease quantity">−</button><span>${line.quantity}</span><button data-adjust="${i}" data-delta="1" aria-label="Increase quantity">+</button><button data-edit="${i}" aria-label="Edit item">${uiIcon('edit')}</button><button data-remove="${i}" class="remove-line" aria-label="Remove item">${uiIcon('trash')}</button></div></div></div>`;
   }).join('')}</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><strong>${money(calculateTotal(cart))}</strong></div><div class="summary-row total"><span>Order total</span><strong>${money(calculateTotal(cart))}</strong></div><p class="muted-help">No delivery or additional charges have been included. Special requests and availability require café confirmation.</p></div>`;
 }
 function openCart() {
@@ -195,7 +217,7 @@ function paymentOptions() {
 }
 function bankPanel() {
   return `<section id="bank-panel" class="bank-panel" hidden aria-label="Bank transfer instructions">
-    <h3>🏦 Bank transfer details</h3>
+    <h3>${uiIcon('bank')} Bank transfer details</h3>
     <dl><dt>Bank</dt><dd>${html(BUSINESS.bankName)}</dd><dt>Account holder</dt><dd>${html(BUSINESS.accountName)}</dd><dt>Account number</dt><dd>${html(BUSINESS.accountNumber)} <button type="button" class="bank-copy" id="copy-account">Copy</button></dd><dt>Branch</dt><dd>${html(BUSINESS.branch)}</dd><dt>Account type</dt><dd>${html(BUSINESS.accountType)}</dd></dl>
     <div class="summary-row total"><span>Menu total</span><strong>${money(calculateTotal(cart))}</strong></div>
     <p class="muted-help">Confirm availability and the final amount with the café before transferring. <a href="https://wa.me/${BUSINESS.whatsapp}" target="_blank" rel="noopener noreferrer">Contact Boot-Up ↗</a></p>
@@ -260,7 +282,7 @@ function reference() {
   return 'BU-'+ymd+'-'+Array.from(bits,b=>b.toString(16).padStart(2,'0')).join('').toUpperCase();
 }
 function buildMessage(details) {
-  const lines=[`⚡ BOOT-UP CAFÉ — ORDER REQUEST`,`Draft reference: ${draftRef || (draftRef=reference())}`,`Name: ${details.name}`,`Phone: ${details.phone}`,'', '🛍 MY ORDER'];
+  const lines=[`BOOT-UP CAFÉ — ORDER REQUEST`,`Draft reference: ${draftRef || (draftRef=reference())}`,`Name: ${details.name}`,`Phone: ${details.phone}`,'', 'MY ORDER'];
   cart.forEach((line,i)=>{
     const item=findItem(line.id);
     lines.push(`${i+1}. ${line.quantity} × ${item.name} — ${money(priceFor(item,line.options)*line.quantity)}`);
@@ -299,11 +321,11 @@ function reviewCheckout() {
   const body=`<div class="checkout-progress"><b>2. REVIEW YOUR REQUEST</b> → SEND IN WHATSAPP</div>
     <div class="alert warning"><strong>Important:</strong> This is an unsent draft. Opening WhatsApp does not send it automatically. Tap Send inside WhatsApp and wait for the café to confirm acceptance.</div>
     <pre class="order-preview">${html(previewMessage)}</pre>
-    ${payment===PAYMENT.BANK?`<div class="alert success"><strong>📎 Receipt selected:</strong> ${html(receiptFile.name)}<br />Not yet sent or verified. Share the receipt and order in WhatsApp; choose Boot-Up Café (+1 876 304 0394) as the recipient. If file sharing is unavailable, open the café chat and attach the same receipt there manually.</div>`:'<div class="alert">Cash on delivery / collection selected. No receipt required.</div>'}`;
+    ${payment===PAYMENT.BANK?`<div class="alert success"><strong>Receipt selected:</strong> ${html(receiptFile.name)}<br />Not yet sent or verified. Share the receipt and order in WhatsApp; choose Boot-Up Café (+1 876 304 0394) as the recipient. If file sharing is unavailable, open the café chat and attach the same receipt there manually.</div>`:'<div class="alert">Cash on delivery / collection selected. No receipt required.</div>'}`;
   const shareData=payment===PAYMENT.BANK?{files:[receiptFile],text:previewMessage}:null;
   const canShare=shareData&&supportsReceiptShare(shareData);
-  const footer=`${canShare?'<button class="button button-primary full-width" id="share-receipt-order" type="button">📎 Share order + receipt via WhatsApp</button>':''}
-    <a class="button ${canShare?'button-outline':'button-primary'} full-width" id="send-whatsapp" href="${html(url)}" target="_blank" rel="noopener noreferrer">${payment===PAYMENT.BANK?'💬 Open café chat & attach receipt manually ↗':'💬 Open WhatsApp & send order ↗'}</a>
+  const footer=`${canShare?'<button class="button button-primary full-width" id="share-receipt-order" type="button">Share order + receipt via WhatsApp</button>':''}
+    <a class="button ${canShare?'button-outline':'button-primary'} full-width" id="send-whatsapp" href="${html(url)}" target="_blank" rel="noopener noreferrer">${payment===PAYMENT.BANK?'Open café chat & attach receipt manually ↗':'Open WhatsApp & send order ↗'}</a>
     <div class="order-actions"><button class="button button-outline" id="copy-order" type="button">Copy order</button><button class="button button-outline" id="back-to-checkout" type="button">← Edit details</button></div>`;
   openDialog('Review your order',body,footer,true);
 }
@@ -322,7 +344,7 @@ async function shareReceiptOrder(){
 function siteURL(){return new URL('./',location.href.split('#')[0]).href;}
 function openQR(){
   const url=siteURL();const qr='https://api.qrserver.com/v1/create-qr-code/?size=480x480&margin=15&data='+encodeURIComponent(url);
-  const body=`<div class="qr-card" id="print-qr"><div style="font-size:38px">⚡</div><h3>BOOT-UP CAFÉ</h3><p>SCAN TO ORDER</p><img src="${html(qr)}" alt="QR code to open the Boot-Up Café menu" /><p class="qr-url">${html(url)}</p></div>
+  const body=`<div class="qr-card" id="print-qr"><div class="qr-brand-icon"><img src="./assets/bootup-icon.svg" alt="" width="50" height="50" /></div><h3>BOOT-UP CAFÉ</h3><p>SCAN TO ORDER</p><img src="${html(qr)}" alt="QR code to open the Boot-Up Café menu" /><p class="qr-url">${html(url)}</p></div>
   <p class="muted-help" style="text-align:center">This QR code opens the current website address. Print it from the final production site, not a preview page. The QR image requires an internet connection.</p>
   <div class="qr-actions"><button class="button button-outline" id="copy-site" type="button">Copy menu link</button><button class="button button-primary" id="print-qr-btn" type="button">Print QR sign</button></div>`;
   openDialog('Scan to order',body);
@@ -403,4 +425,4 @@ document.addEventListener('keydown',event=>{
 $('#overlay').addEventListener('click',closeDialog);
 $('#year').textContent=String(new Date().getFullYear());
 renderCategories();renderProducts();renderCombos();updateCartBadge();
-if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js').catch(()=>{});
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{});

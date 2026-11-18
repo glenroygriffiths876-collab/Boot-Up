@@ -1,6 +1,6 @@
 /* Boot-Up Café lightweight offline shell: never queues or pretends to send orders. */
-const CACHE = 'bootup-v6-cart-viewport';
-const SHELL = ['./','./index.html','./styles.css?v=6','./main.js?v=6','./catalog.js','./assets/bootup-icon.svg','./assets/icon-192.png','./assets/icon-512.png','./manifest.webmanifest','./assets/menu/wings-5.webp','./assets/menu/wings-10.webp','./assets/menu/chicken-wrap.webp','./assets/menu/chickpea-wrap.webp','./assets/menu/ackee-wrap.webp','./assets/menu/fried-plantain.webp','./assets/menu/sunrise-energy.webp','./assets/menu/berry-power.webp','./assets/menu/green-fuel.webp','./assets/menu/tropical-bootup.webp','./assets/menu/milk-blended.webp','./assets/menu/combo-10-side.webp','./assets/menu/combo-5-side.webp','./assets/menu/combo-10-wrap.webp','./assets/menu/combo-5-wrap.webp'];
+const CACHE = 'bootup-v7-real-food';
+const SHELL = ['./','./index.html','./styles.css?v=7','./main.js?v=7','./catalog.js?v=7','./assets/bootup-icon.svg','./assets/icon-192.png','./assets/icon-512.png','./manifest.webmanifest','./assets/menu/wings-5.webp','./assets/menu/wings-10.webp','./assets/menu/chicken-wrap.webp','./assets/menu/chickpea-wrap.webp','./assets/menu/ackee-wrap.webp','./assets/menu/fried-plantain.webp','./assets/menu/corn-on-cob.jpg','./assets/menu/sunrise-energy.jpg','./assets/menu/berry-power.jpg','./assets/menu/green-fuel.jpg','./assets/menu/tropical-bootup.jpg','./assets/menu/milk-blended.jpg','./assets/menu/combo-10-side.webp','./assets/menu/combo-5-side.webp','./assets/menu/combo-10-wrap.webp','./assets/menu/combo-5-wrap.webp'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(SHELL.map(url=>new Request(url,{cache:'reload'})))).then(()=>self.skipWaiting()));
 });

@@ -47,7 +47,7 @@ try{
       },selectors);
       assert.deepEqual(result,[],width+'x'+height+' '+label+': '+result.join('; '));
     }
-    await fits(['.header-content','.brand','.cart-trigger','.hero-copy','.hero-art','.section-top','.product-card','.product-body','.product-bottom','.add-button','.combo-card','.combo-bottom','.combo-card button','.mobile-cart','#mobile-cart-summary','#mobile-cart-items','#mobile-cart-total'],'menu');
+    await fits(['.header-content','.brand','.cart-trigger','.hero-copy','.hero-art','.section-top','.product-card','.product-body','.product-bottom','.add-button','.combo-card','.combo-bottom','.combo-card button','.menu-controls','.filter-chip','.mobile-cart','#mobile-cart-summary','#mobile-cart-items','#mobile-cart-total'],'menu');
     await page.locator('button[data-open="wings5"]').click();
     await page.locator('#customize-form').waitFor();
     await fits(['.dialog','.dialog-header','.dialog-body','.dialog-footer','.choice','.field-input','#add-custom'],'customisation');

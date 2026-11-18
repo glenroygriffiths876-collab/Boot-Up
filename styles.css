@@ -203,3 +203,41 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 @media(max-width:380px){
   #mobile-cart-summary{flex-direction:column;align-items:flex-end;gap:2px}
 }
+
+/* v7 — consistent real food imagery, compact controls and no pictographic emoji fallbacks. */
+.ui-icon{display:inline-block;width:19px;height:19px;vertical-align:middle;flex:0 0 auto;color:currentColor}
+.header-actions .cart-trigger .ui-icon,.mobile-cart-label .ui-icon{width:20px;height:20px}
+.mobile-cart-label{display:flex;align-items:center;gap:7px;min-width:0}
+.menu-controls{display:flex;flex-wrap:wrap;overflow:visible;align-items:stretch;gap:9px;padding:3px 0 16px;max-width:100%;min-width:0}
+.filter-chip{display:inline-flex;align-items:center;justify-content:flex-start;gap:7px;padding:5px 12px 5px 5px;min-height:44px;max-width:100%;min-width:0;white-space:normal;text-align:left;line-height:1.15}
+.filter-chip span{margin:0}.filter-photo{display:block;width:32px;height:32px;flex:0 0 32px;border-radius:50%;overflow:hidden;background:#111827}
+.filter-photo img{display:block;width:100%;height:100%;object-fit:cover;object-position:center}
+.filter-label{min-width:0;overflow-wrap:anywhere}
+.product-visual,.dialog-product-image,.combo-photo{background:#090d16}
+.photo-full img{object-fit:contain;object-position:center;filter:none}
+.product-card:hover .photo-full img{transform:none}
+.product-visual.photo-full:after{display:none}
+.dialog-product-image.photo-full{height:clamp(165px,38vw,240px)}
+.hero-mini-juice img{object-fit:cover;object-position:center}
+.meal-photo-composition{display:grid;grid-template-columns:1fr 1fr 1fr;width:100%;height:100%;min-height:0;overflow:hidden;background:#090d16;gap:2px}
+.meal-photo-composition img{width:100%;height:100%;min-width:0;object-fit:cover!important;object-position:center;filter:none}
+.meal-photo-composition img:nth-child(3){object-fit:cover!important;object-position:50% 50%}
+.cart-item-icon{display:block;overflow:hidden;background:#090d16;width:62px;height:62px;flex:0 0 62px;border-radius:11px}
+.cart-item-icon img{width:100%;height:100%;object-fit:cover;display:block}
+.cart-item-info{min-width:0}
+.cart-line-actions{flex-wrap:wrap}
+.cart-line-actions button{display:inline-flex;align-items:center;justify-content:center}
+.cart-line-actions .ui-icon{width:17px;height:17px}
+.empty-cart-icon{display:grid;place-items:center;margin:auto;width:76px;height:76px;border:1px solid var(--line);border-radius:22px;color:var(--pink2);background:#18213d}
+.empty-cart-icon .ui-icon{width:45px;height:45px}
+.bank-panel h3{display:flex;gap:8px;align-items:center}
+.step-icon .ui-icon{width:38px;height:38px;color:var(--pink2)}
+.hero-highlights .ui-icon{width:16px;height:16px}
+@media(max-width:500px){
+ .menu-controls{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .filter-chip{width:100%;justify-content:flex-start;padding:5px 8px 5px 5px;font-size:12px}
+ .filter-photo{height:30px;width:30px;flex-basis:30px}
+ .cart-item{padding:11px;gap:9px}.cart-item-icon{width:49px;height:49px;flex-basis:49px}
+ .product-visual.photo-full{min-height:112px}
+}
+@media(max-width:360px){.cart-item-icon{display:block;width:40px;height:40px;flex-basis:40px}.cart-line-actions{gap:5px}}
