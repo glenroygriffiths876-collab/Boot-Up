@@ -61,7 +61,7 @@ export const PRODUCTS = [
     image:'./assets/menu/tropical-bootup.jpg', description:'Mango • Pineapple • Banana',
     ingredients:['Mango','Pineapple','Banana']},
   {id:'milk-unconfigured', category:'milk', name:'Milk-Based Blended Drinks', price:850, sizes:MILK_SIZES,
-    emoji:'🥛', accent:'blue', image:'./assets/menu/milk-blended.jpg', available:false,
+    accent:'blue', image:'./assets/menu/milk-blended.jpg', available:false,
     description:'Small J$850 • Large J$1,150. Flavours to be confirmed by the café.'}
 ];
 

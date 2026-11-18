@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { PRODUCTS,COMBOS,ALL_ITEMS,JUICE_SIZES,MILK_SIZES,priceFor,calculateTotal,PAYMENT,receiptError,BUSINESS } from '../catalog.js';
 
 test('poster wing and wrap prices',()=>{
@@ -33,9 +35,22 @@ test('all configurable menu items have unique ids',()=>{
 
 test('every advertised product and combo has a meaningful image source',()=>{
  assert.ok([...PRODUCTS,...COMBOS].every(p=>typeof p.image==='string' && p.image.length>8));
- const verify = [...PRODUCTS,...COMBOS].filter(p=>p.image.startsWith('./assets/'));
- for(const item of verify) {
-   assert.ok(item.image.endsWith('.webp'),item.id+' should use an optimized food photograph');
+ const hashes=new Set();
+ for(const item of [...PRODUCTS,...COMBOS]) {
+   assert.match(item.image,/^\.\/assets\/menu\/[\w-]+\.(?:webp|jpe?g)$/i,item.id+' should use a local optimized food photograph');
+   const bytes=readFileSync(new URL('../'+item.image.slice(2),import.meta.url));
+   assert.ok(bytes.length>1000,item.id+' image is missing or empty');
+   if(/\.jpe?g$/i.test(item.image)){
+     assert.equal(bytes[0],0xff,item.id+' invalid JPEG');
+     assert.equal(bytes[1],0xd8,item.id+' invalid JPEG');
+   }else{
+     assert.equal(bytes.toString('ascii',8,12),'WEBP',item.id+' invalid WebP');
+   }
+   if(['sunrise','berry','green','tropical','corn','milk'].includes(item.id)){
+     const hash=createHash('sha256').update(bytes).digest('hex');
+     assert.ok(!hashes.has(hash),item.id+' must have its own photograph');
+     hashes.add(hash);
+   }
  }
 });
 

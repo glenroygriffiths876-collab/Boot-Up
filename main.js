@@ -1,4 +1,4 @@
-import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js?v=7';
+import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js?v=8';
 
 const $ = selector => document.querySelector(selector);
 const html = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -204,7 +204,7 @@ function cartHTML() {
   if(!cart.length) return `<div class="empty-state"><div class="empty-cart-icon">${uiIcon('bag')}</div><h3>Your bag is feeling empty</h3><p>It's time to power up your day with some flavour.</p><button class="button button-primary" type="button" id="continue-shopping">Explore the menu ↗</button></div>`;
   return `<div class="cart-items">${cart.map((line,i)=>{
       const item=findItem(line.id);
-      return `<div class="cart-item"><div class="cart-item-icon">${item.includesSunrise?itemPhoto(findItem('sunrise')):itemPhoto(item)}</div><div class="cart-item-info"><strong>${html(item.name)}</strong><small>${html(optionSummary(line.options)) || 'Standard preparation'}</small><b>${money(priceFor(item,line.options)*line.quantity)}</b><div class="cart-line-actions"><button data-adjust="${i}" data-delta="-1" aria-label="Decrease quantity">−</button><span>${line.quantity}</span><button data-adjust="${i}" data-delta="1" aria-label="Increase quantity">+</button><button data-edit="${i}" aria-label="Edit item">${uiIcon('edit')}</button><button data-remove="${i}" class="remove-line" aria-label="Remove item">${uiIcon('trash')}</button></div></div></div>`;
+      return `<div class="cart-item"><div class="cart-item-icon">${itemPhoto(item)}</div><div class="cart-item-info"><strong>${html(item.name)}</strong><small>${html(optionSummary(line.options)) || 'Standard preparation'}</small><b>${money(priceFor(item,line.options)*line.quantity)}</b><div class="cart-line-actions"><button data-adjust="${i}" data-delta="-1" aria-label="Decrease quantity">−</button><span>${line.quantity}</span><button data-adjust="${i}" data-delta="1" aria-label="Increase quantity">+</button><button data-edit="${i}" aria-label="Edit item">${uiIcon('edit')}</button><button data-remove="${i}" class="remove-line" aria-label="Remove item">${uiIcon('trash')}</button></div></div></div>`;
   }).join('')}</div><div class="cart-summary"><div class="summary-row"><span>Subtotal</span><strong>${money(calculateTotal(cart))}</strong></div><div class="summary-row total"><span>Order total</span><strong>${money(calculateTotal(cart))}</strong></div><p class="muted-help">No delivery or additional charges have been included. Special requests and availability require café confirmation.</p></div>`;
 }
 function openCart() {
@@ -425,4 +425,4 @@ document.addEventListener('keydown',event=>{
 $('#overlay').addEventListener('click',closeDialog);
 $('#year').textContent=String(new Date().getFullYear());
 renderCategories();renderProducts();renderCombos();updateCartBadge();
-if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js?v=7').catch(()=>{});
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js?v=8').catch(()=>{});
