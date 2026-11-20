@@ -253,6 +253,7 @@ function checkoutHTML() {
   <div class="schedule-card" aria-label="Friday pre-order schedule">
       <span class="schedule-eyebrow">FRIDAY COLLECTIONS • PRE-ORDER ONLY</span>
       <p>Choose a Friday <strong>at least one day ahead</strong>. Same-day orders and other weekdays are not available.</p>
+      <div class="next-friday-note">Earliest eligible Friday: <strong>${formatFriday(nextFridayAfter(todayInJamaica()))}</strong></div>
       <div class="form-field"><label for="pickup-date">Choose your Friday <span class="required">*</span></label>
       <input type="date" id="pickup-date" name="pickupDate" class="field-input" required min="${nextFridayAfter(todayInJamaica())}" step="7" aria-describedby="date-hint" />
       <p id="date-hint" class="muted-help">Tap the calendar to choose an upcoming Friday. Dates are based on Jamaica time.</p></div>
