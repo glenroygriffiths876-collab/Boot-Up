@@ -452,4 +452,4 @@ document.addEventListener('keydown',event=>{
 $('#overlay').addEventListener('click',closeDialog);
 $('#year').textContent=String(new Date().getFullYear());
 renderCategories();renderProducts();renderCombos();updateCartBadge();
-if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js?v=8').catch(()=>{});
+if('serviceWorker' in navigator && location.protocol==='https:') navigator.serviceWorker.register('./sw.js?v=9').catch(()=>{});
