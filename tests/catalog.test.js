@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { PRODUCTS,COMBOS,ALL_ITEMS,JUICE_SIZES,MILK_SIZES,priceFor,calculateTotal,PAYMENT,receiptError,BUSINESS } from '../catalog.js';
+import { PRODUCTS,COMBOS,ALL_ITEMS,JUICE_SIZES,MILK_SIZES,priceFor,calculateTotal,PAYMENT,receiptError,BUSINESS,BOTTLED_FLAVOURS } from '../catalog.js';
 
 test('poster wing and wrap prices',()=>{
  assert.equal(PRODUCTS.find(p=>p.id==='wings5').price,800);
@@ -37,8 +37,11 @@ test('every advertised product and combo has a meaningful image source',()=>{
  assert.ok([...PRODUCTS,...COMBOS].every(p=>typeof p.image==='string' && p.image.length>8));
  const hashes=new Set();
  for(const item of [...PRODUCTS,...COMBOS]) {
-   assert.match(item.image,/^\.\/assets\/menu\/[\w-]+\.(?:webp|jpe?g)$/i,item.id+' should use a local optimized food photograph');
-   const bytes=readFileSync(new URL('../'+item.image.slice(2),import.meta.url));
+    // External licensed replacement photos always retain an existing local fallback.
+    const path=item.fallbackImage || item.image;
+    if(item.fallbackImage)assert.match(item.image,/^https:\/\//,item.id+' needs an HTTPS photo');
+    assert.match(path,/^\.\/assets\/menu\/[\w-]+\.(?:webp|jpe?g)$/i,item.id+' needs a locally hosted image/fallback');
+    const bytes=readFileSync(new URL('../'+path.slice(2),import.meta.url));
    assert.ok(bytes.length>1000,item.id+' image is missing or empty');
    if(/\.jpe?g$/i.test(item.image)){
      assert.equal(bytes[0],0xff,item.id+' invalid JPEG');
@@ -69,4 +72,13 @@ test('transfer receipt accepts supported files and rejects invalid or oversized 
  assert.equal(receiptError({name:'receipt.png',type:'image/png',size:100}),'');
  assert.equal(receiptError({name:'receipt.pdf',type:'application/pdf',size:100}),'');
  assert.equal(receiptError({name:'receipt.HEIC',type:'',size:100}),'');
+});
+
+test('natural bottled juice flavours and sweetener have no invented price',()=>{
+  assert.deepEqual([...BOTTLED_FLAVOURS],['Mango','Cucumber','Guava','Beet','Plum']);
+  const item=PRODUCTS.find(p=>p.id==='bottled-juices');
+  assert.equal(item.available,false);
+  assert.equal(item.price,null);
+  assert.match(item.description,/agave/i);
+  assert.equal(BUSINESS.preorderWeekday,5);
 });
