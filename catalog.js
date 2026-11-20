@@ -10,6 +10,7 @@ export const BUSINESS = Object.freeze({
   accountNumber: '100414586',
   branch: 'Negril Branch',
   accountType: 'Savings',
+  preorderWeekday: 5, // Friday (0=Sunday); dates must be at least one day in advance
   hours: '',
   address: '',
   includedComboJuiceSize: null // owner must confirm size for advertised Sunrise Energy combos
@@ -21,7 +22,8 @@ export const CATEGORIES = [
   { id: 'wraps', title: 'Wraps' },
   { id: 'sides', title: 'Sides' },
   { id: 'juices', title: 'Blended juices' },
-  { id: 'milk', title: 'Milk-based' }
+  { id: 'milk', title: 'Milk-based' },
+  { id: 'bottled', title: 'Bottled juices' }
 ];
 
 export const WING_FLAVOURS = ['Honey Garlic', 'Buffalo', 'BBQ', 'Sweet Chili'];
@@ -29,6 +31,7 @@ export const SIDES = ['Fried Plantain', 'Corn on the Cob'];
 export const WRAPS = ['Chicken Wrap', 'Chickpea Wrap', 'Ackee Wrap'];
 export const JUICE_SIZES = Object.freeze({ Small: 350, Large: 550 });
 export const MILK_SIZES = Object.freeze({ Small: 850, Large: 1150 });
+export const BOTTLED_FLAVOURS = Object.freeze(['Mango', 'Cucumber', 'Guava', 'Beet', 'Plum']);
 
 export const PRODUCTS = [
   {id:'wings5', category:'wings', name:'5 Piece Wings', price:800, accent:'pink', featured:true,
@@ -47,7 +50,7 @@ export const PRODUCTS = [
   {id:'plantain', category:'sides', name:'Fried Plantain', price:250, accent:'gold',
     image:'./assets/menu/fried-plantain.webp', description:'Golden, sweet and deliciously satisfying.'},
   {id:'corn', category:'sides', name:'Corn on the Cob', price:250, accent:'green',
-    image:'./assets/menu/corn-on-cob.jpg', description:'A comforting, flavourful side.'},
+    image:'https://www.freefoodphotos.com/imagelibrary/vegetables/slides/buttery_sweet_corn.jpg', fallbackImage:'./assets/menu/corn-on-cob.jpg', description:'Golden corn on the cob with melted butter — not charred.'},
   {id:'sunrise', category:'juices', name:'Sunrise Energy', price:350, sizes:JUICE_SIZES, accent:'orange',
     image:'./assets/menu/sunrise-energy.jpg', description:'Orange • Pineapple • Coconut',
     ingredients:['Orange','Pineapple','Coconut']},
@@ -61,8 +64,11 @@ export const PRODUCTS = [
     image:'./assets/menu/tropical-bootup.jpg', description:'Mango • Pineapple • Banana',
     ingredients:['Mango','Pineapple','Banana']},
   {id:'milk-unconfigured', category:'milk', name:'Milk-Based Blended Drinks', price:850, sizes:MILK_SIZES,
-    accent:'blue', image:'./assets/menu/milk-blended.jpg', available:false,
-    description:'Small J$850 • Large J$1,150. Flavours to be confirmed by the café.'}
+    accent:'blue', image:'https://images.pexels.com/photos/11299731/pexels-photo-11299731.jpeg?auto=compress&dpr=1&h=750&w=1260', fallbackImage:'./assets/menu/milk-blended.jpg', available:false,
+    description:'Creamy milk-based drink served in a cup with a straw. Small J$850 • Large J$1,150. Flavours to be confirmed by the café.'},
+  {id:'bottled-juices', category:'bottled', name:'Natural Bottled Juices', price:null, available:false,
+    accent:'green', image:'./assets/menu/tropical-bootup.jpg', flavours:BOTTLED_FLAVOURS,
+    description:'Mango • Cucumber • Guava • Beet • Plum. All sweetened with agave. Price to be confirmed.'}
 ];
 
 export const COMBOS = [
