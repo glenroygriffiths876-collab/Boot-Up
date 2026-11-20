@@ -255,3 +255,5 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 .schedule-card input::-webkit-calendar-picker-indicator{cursor:pointer;filter:invert(1);opacity:.9}
 .schedule-card .muted-help{margin:7px 0 0;line-height:1.55}
 @media(max-width:500px){.schedule-card{padding:13px;gap:12px}.schedule-card .field-input{min-height:50px}.schedule-eyebrow{font-size:10px}}
+
+.next-friday-note{border:1px solid rgba(255,255,255,.2);background:rgba(9,15,39,.58);padding:10px 12px;border-radius:10px;font-size:12px;line-height:1.5;color:#edf2ff;overflow-wrap:anywhere}.next-friday-note strong{color:#ffc3da}
