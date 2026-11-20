@@ -245,3 +245,13 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
 .cart-item-icon .meal-photo-composition{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:1px}
 .cart-item-icon .meal-photo-composition img:first-child{grid-row:span 2}
 .cart-item-icon .meal-photo-composition img{min-height:0}
+
+/* v9 — Friday-only advance ordering, compact responsive calendar form. */
+.schedule-card{display:grid;gap:14px;padding:18px;border:1px solid rgba(251,92,156,.5);border-radius:18px;background:linear-gradient(135deg,rgba(245,47,128,.14),rgba(33,52,104,.23));min-width:0;max-width:100%;overflow:hidden}
+.schedule-eyebrow{display:block;color:#ffabd0;font-weight:900;letter-spacing:1px;font-size:11px;line-height:1.5}
+.schedule-card>p{font-size:13px;color:#eef2ff;line-height:1.65;margin:0}
+.schedule-card .form-field{min-width:0;max-width:100%}
+.schedule-card .field-input{width:100%;max-width:100%;min-width:0;box-sizing:border-box;font-family:inherit;font-size:16px;color-scheme:dark}
+.schedule-card input::-webkit-calendar-picker-indicator{cursor:pointer;filter:invert(1);opacity:.9}
+.schedule-card .muted-help{margin:7px 0 0;line-height:1.55}
+@media(max-width:500px){.schedule-card{padding:13px;gap:12px}.schedule-card .field-input{min-height:50px}.schedule-eyebrow{font-size:10px}}
