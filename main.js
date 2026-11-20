@@ -1,4 +1,5 @@
-import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js?v=8';
+import { BUSINESS, CATEGORIES, PRODUCTS, COMBOS, ALL_ITEMS, WING_FLAVOURS, SIDES, WRAPS, money, priceFor, calculateTotal, PAYMENT, receiptError } from './catalog.js?v=9';
+import { todayInJamaica, nextFridayAfter, isFridayPreorder, formatFriday, formatPreferredTime } from './schedule.js?v=9';
 
 const $ = selector => document.querySelector(selector);
 const html = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
@@ -50,7 +51,7 @@ const icons = {
   bolt:'<path d="m13 2-9 12h7l-1 8 10-12h-7l0-8Z"/>'
 };
 const uiIcon = name => `<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${icons[name]||''}</svg>`;
-const categoryPhotos={all:'wings5',wings:'wings10',wraps:'wrap-chicken',sides:'corn',juices:'sunrise',milk:'milk-unconfigured'};
+const categoryPhotos={all:'wings5',wings:'wings10',wraps:'wrap-chicken',sides:'corn',juices:'sunrise',milk:'milk-unconfigured',bottled:'bottled-juices'};
 const itemPhoto = item => {
   if(!item?.image) return '';
   // A composition of separate actual menu assets keeps the bottle consistent in both wrap combos.
@@ -60,23 +61,23 @@ const itemPhoto = item => {
     const juice=findItem('sunrise');
     return `<div class="meal-photo-composition" aria-hidden="true">${[wings,wrap,juice].map(x=>`<img src="${html(x.image)}" alt="" loading="lazy" decoding="async" />`).join('')}</div>`;
   }
-  return `<img src="${html(item.image)}" alt="" loading="lazy" decoding="async" />`;
+  return `<img src="${html(item.image)}" alt="" loading="lazy" decoding="async" ${item.fallbackImage ? `onerror="this.onerror=null;this.src='${html(item.fallbackImage)}'"` : ''} />`;
 };
 function imageMarkup(p, className='product-visual') {
-  return `<div class="${className} accent-${html(p.accent || 'pink')}${p.category==='juices'||p.category==='milk'||p.id==='corn'?' photo-full':''}">${itemPhoto(p)}</div>`;
+  return `<div class="${className} accent-${html(p.accent || 'pink')}${p.category==='juices'||p.category==='milk'||p.category==='bottled'||p.id==='corn'?' photo-full':''}">${itemPhoto(p)}</div>`;
 }
 function renderCategories() {
   $('#category-tabs').innerHTML = CATEGORIES.map(cat=>`<button class="filter-chip ${cat.id===filter?'active':''}" data-filter="${cat.id}" type="button" aria-pressed="${cat.id===filter}"><span class="filter-photo" aria-hidden="true">${itemPhoto(findItem(categoryPhotos[cat.id]))}</span><span class="filter-label">${html(cat.title)}</span></button>`).join('');
 }
 function renderProducts() {
   const shown = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p=>p.category===filter);
-  $('#product-grid').innerHTML = shown.map(p=>`<article class="product-card" tabindex="${p.available===false?'-1':'0'}" role="${p.available===false?'group':'button'}" data-open="${html(p.id)}" aria-label="${html(p.name)} for ${money(p.price)}">
+  $('#product-grid').innerHTML = shown.map(p=>`<article class="product-card" tabindex="${p.available===false?'-1':'0'}" role="${p.available===false?'group':'button'}" data-open="${html(p.id)}" aria-label="${html(p.name)} — ${p.price==null?'Price to be confirmed':money(p.price)}">
       ${imageMarkup(p)}
       ${p.featured?'<span class="product-tag">FAN FAVOURITE</span>':''}
       <div class="product-body"><span class="product-category">${html(CATEGORIES.find(c=>c.id===p.category)?.title || '')}</span><h3 class="product-title">${html(p.name)}</h3>
       <p class="product-description">${html(p.description)}</p>
-      <div class="product-bottom"><span class="product-price">${p.sizes ? `<small>From</small>` : ''}${money(p.price)}</span>
-      <button type="button" class="add-button" data-open="${html(p.id)}" ${p.available===false?'disabled':''}>${p.available===false?'Coming soon':'Customise +'}</button></div></div></article>`).join('');
+      <div class="product-bottom"><span class="product-price">${p.sizes ? `<small>From</small>` : ''}${p.price==null?'<small>Price pending</small>':money(p.price)}</span>
+      <button type="button" class="add-button" data-open="${html(p.id)}" ${p.available===false?'disabled':''}>${p.available===false?(p.id==='bottled-juices'?'Price pending':'Coming soon'):'Customise +'}</button></div></div></article>`).join('');
 }
 function renderCombos() {
   $('#combo-grid').innerHTML = COMBOS.map((p,i)=>`<article class="combo-card"><span class="combo-no">POWER COMBO 0${i+1}</span>
@@ -146,7 +147,7 @@ function openProduct(id, index=-1) {
   if(isCombo && product.pickWrap) optionsHTML+=`<label class="field-title" for="combo-wrap">Choose your wrap *</label><select id="combo-wrap" name="wrap" class="field-input"><option value="">Select a wrap</option>${WRAPS.map(w=>`<option ${o.wrap===w?'selected':''}>${html(w)}</option>`).join('')}</select><p class="muted-help">Describe wrap ingredient removals in the instructions below.</p>`;
   if(isCombo && product.includesSunrise) optionsHTML+=`<p class="alert">Includes <strong>Sunrise Energy</strong> (Orange, Pineapple, Coconut). The included drink size has not been confirmed by the café; it will be clarified before acceptance.</p>`;
   optionsHTML+=textField('Special preparation requests','specials','Tell us what to add, remove or change. Unpriced extras require confirmation.');
-  const content=`<div class="dialog-product-image${product.category==='juices'||product.category==='milk'||product.id==='corn'?' photo-full':''}">${itemPhoto(product)}</div>
+  const content=`<div class="dialog-product-image${product.category==='juices'||product.category==='milk'||product.category==='bottled'||product.id==='corn'?' photo-full':''}">${itemPhoto(product)}</div>
   <p class="dialog-description">${html(product.description || 'A flavour-packed Boot-Up Café combo.')}</p>
   <form id="customize-form" novalidate>${optionsHTML}<div class="subsection"><span class="field-title">Quantity</span><div class="qty-picker"><button type="button" data-product-qty="-1" aria-label="Decrease quantity">−</button><strong id="product-qty">${saved?.quantity || 1}</strong><button type="button" data-product-qty="1" aria-label="Increase quantity">+</button></div></div>
   <p class="validation-error" id="customize-error" role="alert"></p></form>`;
@@ -249,7 +250,16 @@ function checkoutHTML() {
   <label class="choice"><input type="radio" name="allergy" value="Prefer not to disclose" required />Prefer not to disclose</label></div>
   <div id="allergy-detail" hidden><label class="field-title" for="allergy-description">Describe your allergy *</label><textarea id="allergy-description" name="allergyDescription" class="field-input" rows="2" maxlength="400" placeholder="Ingredients or foods you must avoid"></textarea></div>
   <p class="muted-help">Allergen requests require café review. Cross-contact cannot be ruled out without explicit confirmation.</p></fieldset>
-  <div class="form-field"><label for="pickup">Collection preference</label><select id="pickup" name="pickup" class="field-input"><option value="Pickup time to be confirmed">Pickup — time to be confirmed</option><option value="Request earliest available pickup">Request earliest available pickup</option></select></div>
+  <div class="schedule-card" aria-label="Friday pre-order schedule">
+      <span class="schedule-eyebrow">FRIDAY COLLECTIONS • PRE-ORDER ONLY</span>
+      <p>Choose a Friday <strong>at least one day ahead</strong>. Same-day orders and other weekdays are not available.</p>
+      <div class="form-field"><label for="pickup-date">Choose your Friday <span class="required">*</span></label>
+      <input type="date" id="pickup-date" name="pickupDate" class="field-input" required min="${nextFridayAfter(todayInJamaica())}" step="7" aria-describedby="date-hint" />
+      <p id="date-hint" class="muted-help">Tap the calendar to choose an upcoming Friday. Dates are based on Jamaica time.</p></div>
+      <div class="form-field"><label for="pickup-time">Preferred collection time (optional)</label>
+      <input type="time" id="pickup-time" name="pickupTime" class="field-input" aria-describedby="pickup-time-hint" />
+      <p id="pickup-time-hint" class="muted-help">This is a request, not a confirmed appointment. The café will confirm your time on WhatsApp.</p></div>
+    </div>
   <div class="form-field"><label for="payment">Payment method <span class="required">*</span></label><select id="payment" name="payment" class="field-input" required>${paymentOptions()}</select><p class="muted-help">Cash is paid when receiving your order. Collection or delivery arrangements require café confirmation.</p></div>
   ${bankPanel()}
   <div class="form-field"><label for="order-notes">General order instructions</label><textarea id="order-notes" name="notes" class="field-input" maxlength="450" placeholder="Additional helpful details (optional)"></textarea></div>
@@ -289,7 +299,7 @@ function buildMessage(details) {
     const summary=optionSummary(line.options);
     if(summary) lines.push('   '+summary);
   });
-  lines.push('',`TOTAL: ${money(calculateTotal(cart))}`,`Collection: ${details.pickup}`,`Payment: ${details.payment}`,'',`⚠️ ALLERGY DECLARATION: ${details.allergy}`);
+  lines.push('',`TOTAL: ${money(calculateTotal(cart))}`,`Requested collection date: ${formatFriday(details.pickupDate)}`,`Preferred collection time: ${details.pickupTime?formatPreferredTime(details.pickupTime)+' (subject to café confirmation)':'To be confirmed by café'}`,`Payment: ${details.payment}`,'',`⚠️ ALLERGY DECLARATION: ${details.allergy}`);
   if(details.payment===PAYMENT.BANK) lines.push('PAYMENT STATUS: Transfer receipt selected; please check the attachment in WhatsApp and verify payment.');
   else lines.push('PAYMENT STATUS: Cash due when receiving the order.');
   if(details.allergyDescription) lines.push(`ALLERGY DETAILS: ${details.allergyDescription}`);
@@ -306,6 +316,15 @@ function reviewCheckout() {
   if(phone.replace(/\D/g,'').length<7){error.textContent='Please enter a valid telephone number.';$('#customer-phone').focus();return;}
   if(!allergy){error.textContent='Please choose your allergy declaration.';form.querySelector('[name="allergy"]').focus();return;}
   if(allergy==='Food allergy declared' && !allergyDescription){error.textContent='Please describe your allergy so the café can review it.';$('#allergy-description').focus();return;}
+  const pickupDate = String(fd.get('pickupDate') || '');
+  const pickupTime = String(fd.get('pickupTime') || '');
+  if(!isFridayPreorder(pickupDate)){
+    error.textContent='Please choose an upcoming Friday at least one day in advance. Same-day orders are not accepted.';
+    $('#pickup-date').focus();return;
+  }
+  if(pickupTime && !formatPreferredTime(pickupTime)){
+    error.textContent='Please enter a valid preferred collection time.';$('#pickup-time').focus();return;
+  }
   const payment=fd.get('payment');
   if(![PAYMENT.CASH,PAYMENT.BANK].includes(payment)){error.textContent='Please choose your payment method.';$('#payment').focus();return;}
   if(payment===PAYMENT.BANK){
@@ -315,7 +334,7 @@ function reviewCheckout() {
   error.textContent='';
   checkoutDraft=Object.fromEntries(fd.entries());
   previewMessage=buildMessage({
-    name,phone,allergy,allergyDescription,pickup:fd.get('pickup'),payment:fd.get('payment'),notes:(fd.get('notes')||'').trim()
+    name,phone,allergy,allergyDescription,pickupDate,pickupTime,payment:fd.get('payment'),notes:(fd.get('notes')||'').trim()
   });
   const url='https://wa.me/'+BUSINESS.whatsapp+'?text='+encodeURIComponent(previewMessage);
   const body=`<div class="checkout-progress"><b>2. REVIEW YOUR REQUEST</b> → SEND IN WHATSAPP</div>
@@ -399,6 +418,14 @@ document.addEventListener('click',click);
 document.addEventListener('change',event=>{
   if(event.target.closest('#customize-form'))updateCustomizePrice();
   if(event.target.id==='payment'){syncPayment();$('#checkout-error').textContent='';}
+  if(event.target.id==='pickup-date'){
+    const chosen=event.target.value;
+    const valid=isFridayPreorder(chosen);
+    const hint=$('#date-hint');
+    if(hint) hint.textContent=!chosen?'Tap the calendar to choose an upcoming Friday.':valid?formatFriday(chosen)+' selected — café confirmation required.':'Please select a future Friday, not today or a different weekday.';
+    if(chosen && !valid)event.target.value='';
+    if($('#checkout-error'))$('#checkout-error').textContent='';
+  }
   if(event.target.id==='receipt-file'){
     const next=event.target.files?.[0];
     if(!next)return;
