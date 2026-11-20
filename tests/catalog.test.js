@@ -43,7 +43,7 @@ test('every advertised product and combo has a meaningful image source',()=>{
     assert.match(path,/^\.\/assets\/menu\/[\w-]+\.(?:webp|jpe?g)$/i,item.id+' needs a locally hosted image/fallback');
     const bytes=readFileSync(new URL('../'+path.slice(2),import.meta.url));
    assert.ok(bytes.length>1000,item.id+' image is missing or empty');
-   if(/\.jpe?g$/i.test(item.image)){
+   if(/\.jpe?g$/i.test(path)){
      assert.equal(bytes[0],0xff,item.id+' invalid JPEG');
      assert.equal(bytes[1],0xd8,item.id+' invalid JPEG');
    }else{
