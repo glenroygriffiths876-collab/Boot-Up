@@ -1,0 +1,14 @@
+name = "bootup-orders-api"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+# Fill in the D1 database_id after creating a FREE D1 database.
+# Never put secrets or customer data in this file or GitHub.
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "bootup-orders"
+# database_id = "REPLACE_WITH_REAL_ID"
+
+# Configure exact storefront origins as a Worker secret ALLOWED_ORIGINS.
+# Configure ADMIN_PASSWORD and SESSION_SECRET as Worker secrets.
+# Configure TURNSTILE_SECRET as a Worker secret before public launch.
