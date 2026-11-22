@@ -222,6 +222,9 @@ function bankPanel() {
     <dl><dt>Bank</dt><dd>${html(BUSINESS.bankName)}</dd><dt>Account holder</dt><dd>${html(BUSINESS.accountName)}</dd><dt>Account number</dt><dd>${html(BUSINESS.accountNumber)} <button type="button" class="bank-copy" id="copy-account">Copy</button></dd><dt>Branch</dt><dd>${html(BUSINESS.branch)}</dd><dt>Account type</dt><dd>${html(BUSINESS.accountType)}</dd></dl>
     <div class="summary-row total"><span>Menu total</span><strong>${money(calculateTotal(cart))}</strong></div>
     <p class="muted-help">Confirm availability and the final amount with the café before transferring. <a href="https://wa.me/${BUSINESS.whatsapp}" target="_blank" rel="noopener noreferrer">Contact Boot-Up ↗</a></p>
+    <label for="transfer-reference" class="field-title">Bank transaction reference <span class="required">*</span></label>
+    <input class="field-input" id="transfer-reference" name="transferReference" type="text" maxlength="80" autocomplete="off" placeholder="Enter the reference shown by your bank" disabled />
+    <p class="muted-help">Enter the reference exactly as shown on your bank confirmation. A reference or receipt alone does not confirm payment.</p>
     <label for="receipt-file" class="field-title">Attach proof of payment <span class="required">*</span></label>
     <input type="file" class="field-input" id="receipt-file" accept=".jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" disabled />
     <p class="muted-help">Select a transfer screenshot or PDF (up to 10 MB). The file stays on your device until you share it. Hide unrelated balances or transactions before sharing.</p>
@@ -231,9 +234,9 @@ function bankPanel() {
 }
 function syncPayment() {
   const bank=$('#payment')?.value===PAYMENT.BANK;
-  const panel=$('#bank-panel'),input=$('#receipt-file');
+  const panel=$('#bank-panel'),input=$('#receipt-file'),referenceInput=$('#transfer-reference');
   if(!panel||!input)return;
-  panel.hidden=!bank;input.disabled=!bank;
+  panel.hidden=!bank;input.disabled=!bank;if(referenceInput)referenceInput.disabled=!bank;
   if(!bank){receiptFile=null;input.value='';}
   $('#receipt-status').textContent=receiptFile?'Selected: '+receiptFile.name:'No receipt selected.';
   $('#remove-receipt').hidden=!receiptFile;
@@ -301,7 +304,7 @@ function buildMessage(details) {
     if(summary) lines.push('   '+summary);
   });
   lines.push('',`TOTAL: ${money(calculateTotal(cart))}`,`Requested collection date: ${formatFriday(details.pickupDate)}`,`Preferred collection time: ${details.pickupTime?formatPreferredTime(details.pickupTime)+' (subject to café confirmation)':'To be confirmed by café'}`,`Payment: ${details.payment}`,'',`⚠️ ALLERGY DECLARATION: ${details.allergy}`);
-  if(details.payment===PAYMENT.BANK) lines.push('PAYMENT STATUS: Transfer receipt selected; please check the attachment in WhatsApp and verify payment.');
+  if(details.payment===PAYMENT.BANK) { lines.push(`Bank transaction reference: ${details.transferReference}`); lines.push('PAYMENT STATUS: PENDING VERIFICATION — receipt supplied by customer; café must confirm funds in its bank account.'); }
   else lines.push('PAYMENT STATUS: Cash due when receiving the order.');
   if(details.allergyDescription) lines.push(`ALLERGY DETAILS: ${details.allergyDescription}`);
   if(details.notes) lines.push(`Other instructions: ${details.notes}`);
@@ -329,17 +332,19 @@ function reviewCheckout() {
   const payment=fd.get('payment');
   if(![PAYMENT.CASH,PAYMENT.BANK].includes(payment)){error.textContent='Please choose your payment method.';$('#payment').focus();return;}
   if(payment===PAYMENT.BANK){
+    const transferReference=String(fd.get('transferReference')||'').trim();
+    if(transferReference.length<5 || transferReference.length>80 || !/^[A-Za-z0-9][A-Za-z0-9 /._-]*$/.test(transferReference)){error.textContent='Enter the bank transaction reference shown on your receipt (5–80 characters).';$('#transfer-reference').focus();return;}
     const issue=receiptError(receiptFile);
     if(issue){error.textContent=issue;$('#receipt-file').focus();return;}
   } else receiptFile=null;
   error.textContent='';
   checkoutDraft=Object.fromEntries(fd.entries());
   previewMessage=buildMessage({
-    name,phone,allergy,allergyDescription,pickupDate,pickupTime,payment:fd.get('payment'),notes:(fd.get('notes')||'').trim()
+    name,phone,allergy,allergyDescription,pickupDate,pickupTime,transferReference:String(fd.get('transferReference')||'').trim(),payment:fd.get('payment'),notes:(fd.get('notes')||'').trim()
   });
   const url='https://wa.me/'+BUSINESS.whatsapp+'?text='+encodeURIComponent(previewMessage);
   const body=`<div class="checkout-progress"><b>2. REVIEW YOUR REQUEST</b> → SEND IN WHATSAPP</div>
-    <div class="alert warning"><strong>Important:</strong> This is an unsent draft. Opening WhatsApp does not send it automatically. Tap Send inside WhatsApp and wait for the café to confirm acceptance.</div>
+    <div class="alert warning"><strong>Important:</strong> This is an unsent draft, not a verified payment. Opening WhatsApp does not send it automatically. Tap Send inside WhatsApp and wait for the café to confirm acceptance.</div>
     <pre class="order-preview">${html(previewMessage)}</pre>
     ${payment===PAYMENT.BANK?`<div class="alert success"><strong>Receipt selected:</strong> ${html(receiptFile.name)}<br />Not yet sent or verified. Share the receipt and order in WhatsApp; choose Boot-Up Café (+1 876 304 0394) as the recipient. If file sharing is unavailable, open the café chat and attach the same receipt there manually.</div>`:'<div class="alert">Cash on delivery / collection selected. No receipt required.</div>'}`;
   const shareData=payment===PAYMENT.BANK?{files:[receiptFile],text:previewMessage}:null;
